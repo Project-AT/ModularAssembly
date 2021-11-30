@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "compatibilityLevel": "JAVA_8",
+  "package": "ink.ikx.modularassembly.mixins",
+  "minVersion": "0.7.11",
+  "setSourceFile": true,
+  "priority": 0,
+  "refmap": "mixins.modularassembly.refmap.json",
+  "mixins": [
+    "MixinBlockController",
+    "MixinItemBlueprint"
+  ],
+  "client": [
+  ]
+}

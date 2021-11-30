@@ -1,0 +1,16 @@
+[
+    {
+        "modid": "modularassembly",
+        "name": "Modularassembly",
+        "description": "",
+        "version": "${version}",
+        "mcversion": "${mcversion}",
+        "url": "",
+        "updateUrl": "",
+        "authorList": ["ikexing"],
+        "credits": "",
+        "logoFile": "",
+        "screenshots": [],
+        "dependencies": []
+    }
+]

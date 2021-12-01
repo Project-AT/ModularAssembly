@@ -10,8 +10,12 @@ import java.util.List;
 
 public class StackUtils {
 
+    public static boolean isNotEmpty(ItemStack stack) {
+        return !stack.isEmpty();
+    }
+
     public static boolean isStackFilter(ItemStack stack) {
-        return !stack.isEmpty() && stack.getItem() != Item.getItemFromBlock(BlocksMM.blockController);
+        return isNotEmpty(stack) && stack.getItem() != Item.getItemFromBlock(BlocksMM.blockController);
     }
 
     public static ItemStack getStackFromBlockState(IBlockState state) {
@@ -19,20 +23,21 @@ public class StackUtils {
         return new ItemStack(Item.getItemFromBlock(block), 1, block.getMetaFromState(state));
     }
 
-    public static boolean isAllStacksEqual(List<ItemStack> stacks, List<ItemStack> stacks2) {
-        return getAllStacksEqual(stacks, stacks2) != null;
+    public static boolean hasStacks(List<ItemStack> inputStacks, List<ItemStack> outputStacks, boolean isRemove) {
+        return outputStacks.stream().anyMatch(stack -> hasStack(stack, inputStacks, isRemove));
     }
 
-    public static List<ItemStack> getAllStacksEqual(List<ItemStack> stacks, List<ItemStack> stacks2) {
-        if (stacks.size() != stacks2.size()) {
-            return null;
-        }
-        for (int i = 0; i < stacks.size(); i++) {
-            if (!stacks.get(i).isItemEqual(stacks2.get(i))) {
-                return null;
+    public static boolean hasStack(ItemStack stack, List<ItemStack> stacks, boolean isRemove) {
+        for (ItemStack stackInSlot : stacks) {
+            if (stackInSlot.isEmpty()) continue;
+            if (stackInSlot.isItemEqual(stack)) {
+                if (stackInSlot.getCount() >= stack.getCount()) {
+                    if (isRemove) stackInSlot.shrink(stack.getCount());
+                    return true;
+                }
             }
         }
-        return stacks;
+        return false;
     }
 
 }

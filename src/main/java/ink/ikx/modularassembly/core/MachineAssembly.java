@@ -7,6 +7,7 @@ import hellfirepvp.modularmachinery.common.util.BlockArray.BlockInformation;
 import hellfirepvp.modularmachinery.common.util.MiscUtils;
 import ink.ikx.modularassembly.utils.CollUtils;
 import ink.ikx.modularassembly.utils.StackUtils;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -42,15 +43,17 @@ public class MachineAssembly {
                 this.needFindStacks.put(entry.getKey(), listSamplesFromInfo);
             }
         }
-        // TODO
-        // 将needFindStacks的values与玩家物品栏对比，如果有不匹配的，则返回false
-        return false;
+        List<ItemStack> mainInventoryCopy =
+                player.inventory.mainInventory.stream().map(ItemStack::copy).collect(Collectors.toList());
+
+        return needFindStacks.values().stream()
+                .allMatch(s -> StackUtils.hasStacks(mainInventoryCopy, s, true));
     }
 
     private List<ItemStack> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
         IBlockState state = player.world.getBlockState(getOffsetByFacing(entry.getKey()));
         List<ItemStack> toReturn = Lists.newArrayList(new ItemStack(Items.APPLE));
-        if (entry.getValue().matchesState(state)) return toReturn;
+        if (!entry.getValue().matchesState(state) && state.getMaterial() != Material.AIR) return toReturn;
         try {
             Field fileSamples = entry.getValue().getClass().getDeclaredField("samples");
             fileSamples.setAccessible(true);

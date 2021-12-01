@@ -27,9 +27,8 @@ public class ModularMachineryEvent {
 
         if (world.isRemote) return;
 
-        if (tileEntity instanceof TileMachineController) {
+        if (tileEntity instanceof TileMachineController && !player.isSneaking()) {
             TileMachineController controller = (TileMachineController) tileEntity;
-            if (!player.isSneaking()) return;
             if (stack.getItem().equals(ItemsMM.blueprint)) {
                 if (getBlueprint(controller).isEmpty()) {
                     ItemStack copy = stack.copy();
@@ -37,8 +36,7 @@ public class ModularMachineryEvent {
                     if (isPlayerNotCreative(player)) stack.setCount(stack.getCount() - 1);
                     controller.getInventory().setStackInSlot(TileMachineController.BLUEPRINT_SLOT, copy);
                 }
-                // TODO
-                // 长按右键发包
+                event.setCanceled(true);
             } else if (stack.getItem().equals(Items.STICK)) {
                 DynamicMachine blueprintMachine = controller.getBlueprintMachine();
                 if (blueprintMachine == null) {
@@ -47,10 +45,11 @@ public class ModularMachineryEvent {
                 }
                 MachineAssembly Machine = new MachineAssembly(blockPos, player, blueprintMachine.getPattern().getPattern());
                 if (Machine.isAllItemsContains()) {
-                    player.sendMessage(new TextComponentString("true"));
+                    player.sendMessage(new TextComponentString("Machine assembly success!"));
                 } else {
-                    player.sendMessage(new TextComponentString("false"));
+                    player.sendMessage(new TextComponentString("Machine assembly failed!"));
                 }
+                event.setCanceled(true);
             }
         }
     }

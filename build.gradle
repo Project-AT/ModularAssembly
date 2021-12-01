@@ -5,19 +5,13 @@ buildscript {
             name = "forge"
             url = "https://files.minecraftforge.net/maven"
         }
-        maven {
-            name = "sponge"
-            url = "https://repo.spongepowered.org/maven"
-        }
     }
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
-        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
 
 apply plugin: "net.minecraftforge.gradle.forge"
-apply plugin: 'org.spongepowered.mixin'
 
 group = modVersion
 version = mcVersion
@@ -42,9 +36,7 @@ minecraft {
 repositories {
     mavenCentral()
     maven { url = "https://maven.tterrag.com/" } //Top
-    maven { url = "https://www.cursemaven.com" } //CurseMaven
     maven { url = "https://maven.hellfiredev.net" } //ModularMachinery
-    maven { url = "https://repo.spongepowered.org/maven" } //Mixin
     maven { url = "https://dvs1.progwml6.com/files/maven" } //Jei
 }
 
@@ -52,14 +44,7 @@ dependencies {
     runtime "mezz.jei:jei_${mcVersion}:${jeiVersion}"
     runtime "mcjty.theoneprobe:TheOneProbe-${mcShort}:${topVersion}"
 
-    deobfCompile "curse.maven:mixinbooter-${mixinBooterVersion}"
     deobfCompile "hellfirepvp.modularmachinery:modularmachinery:${mcVersion}-${mmVersion}"
-
-    compile('org.spongepowered:mixin:0.8-SNAPSHOT') {
-        exclude module: 'guava'
-        exclude module: 'commons-io'
-        exclude module: 'gson'
-    }
 }
 
 processResources {
@@ -74,8 +59,4 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude "mcmod.info"
     }
-}
-
-mixin {
-    add sourceSets.main, "mixins.modularassembly.refmap.json"
 }

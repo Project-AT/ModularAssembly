@@ -1,4 +1,4 @@
-package ink.ikx.modularassembly.core;
+package ink.ikx.modularassembly.utils.assembly;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -18,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MachineAssembly {
@@ -77,6 +78,29 @@ public class MachineAssembly {
             facing = facing.rotateYCCW();
         }
         return pos.add(blockPos);
+    }
+
+    public EntityPlayer getPlayer() {
+        return player;
+    }
+
+    public BlockPos getPos() {
+        return pos;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MachineAssembly that = (MachineAssembly) o;
+
+        return Objects.equals(pos, that.pos);
+    }
+
+    @Override
+    public int hashCode() {
+        return pos != null ? pos.hashCode() : 0;
     }
 
 }

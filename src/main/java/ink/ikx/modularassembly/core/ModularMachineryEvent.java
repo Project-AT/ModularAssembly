@@ -3,6 +3,8 @@ package ink.ikx.modularassembly.core;
 import hellfirepvp.modularmachinery.common.lib.ItemsMM;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.TileMachineController;
+import ink.ikx.modularassembly.utils.assembly.MachineAssembly;
+import ink.ikx.modularassembly.utils.assembly.MachineAssemblyManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -44,7 +46,11 @@ public class ModularMachineryEvent {
                     return;
                 }
                 MachineAssembly Machine = new MachineAssembly(blockPos, player, blueprintMachine.getPattern().getPattern());
-                if (Machine.isAllItemsContains()) {
+                if (MachineAssemblyManager.addMachineAssembly(Machine)) {
+                    player.sendMessage(new TextComponentString("Machine assembly added!"));
+                    return;
+                }
+                if (!Machine.isAllItemsContains()) {
                     player.sendMessage(new TextComponentString("Machine assembly success!"));
                 } else {
                     player.sendMessage(new TextComponentString("Machine assembly failed!"));

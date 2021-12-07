@@ -11,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
@@ -19,6 +20,8 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.BlockFluidBase;
+import net.minecraftforge.fluids.FluidUtil;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -69,6 +72,11 @@ public class MachineAssembly {
                 if (StackUtils.isNotEmpty(stack)) {
                     //noinspection deprecation
                     IBlockState state = Block.getBlockFromItem(stack.getItem()).getStateFromMeta(stack.getMetadata());
+                    if (FluidUtil.getFluidHandler(stack) != null) {
+                        state = Objects.requireNonNull(FluidUtil.getFluidContained(stack)).getFluid().getBlock().getDefaultState();
+                        if (stack.getItem() == Items.WATER_BUCKET || stack.getItem() == Items.LAVA_BUCKET)
+                            player.inventory.addItemStackToInventory(new ItemStack(Items.BUCKET));
+                    }
                     getWorld().setBlockState(getOffsetByFacing(next.getKey()), state);
                     getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
                     iterator.remove();
@@ -77,7 +85,7 @@ public class MachineAssembly {
             }
         }
 
-        if (pattern.size() <= 1) {
+        if (pattern.isEmpty()) {
             player.sendMessage(new TextComponentString("&a&lMachine Assembly: &a&lSuccess!"));
             MachineAssemblyManager.removeMachineAssembly(this);
         }
@@ -87,7 +95,8 @@ public class MachineAssembly {
     private List<ItemStack> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
         IBlockState state = player.world.getBlockState(getOffsetByFacing(entry.getKey()));
         List<ItemStack> toReturn = Lists.newArrayList(new ItemStack(Items.APPLE));
-        if (!entry.getValue().matchesState(state) && state.getMaterial() != Material.AIR) return toReturn;
+        if (!entry.getValue().matchesState(state) && state.getMaterial() != Material.AIR && isNotLiquid(state))
+            return toReturn;
         try {
             Field fileSamples = entry.getValue().getClass().getDeclaredField("samples");
             fileSamples.setAccessible(true);
@@ -104,8 +113,13 @@ public class MachineAssembly {
         return toReturn;
     }
 
-    public boolean isNotAir() {
+    public boolean isFilter() {
         return getWorld().getBlockState(pos).getMaterial() != Material.AIR;
+    }
+
+    private boolean isNotLiquid(IBlockState state) {
+        Block block = state.getBlock();
+        return !(block instanceof BlockFluidBase) && block != Blocks.WATER && block != Blocks.LAVA;
     }
 
     private BlockPos getOffsetByFacing(BlockPos blockPos) {

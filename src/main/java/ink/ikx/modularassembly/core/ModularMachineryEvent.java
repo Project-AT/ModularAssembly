@@ -77,7 +77,7 @@ public class ModularMachineryEvent {
         Set<MachineAssembly> machineAssemblyListFromPlayer = MachineAssemblyManager.getMachineAssemblyListFromPlayer(player);
 
         if (CollUtils.isNotEmpty(machineAssemblyListFromPlayer)) {
-            machineAssemblyListFromPlayer.stream().filter(MachineAssembly::isNotAir).forEach(MachineAssembly::build);
+            machineAssemblyListFromPlayer.stream().filter(MachineAssembly::isFilter).forEach(MachineAssembly::build);
         }
     }
 

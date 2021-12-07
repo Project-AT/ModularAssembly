@@ -23,21 +23,22 @@ public class StackUtils {
         return new ItemStack(Item.getItemFromBlock(block), 1, block.getMetaFromState(state));
     }
 
-    public static boolean hasStacks(List<ItemStack> inputStacks, List<ItemStack> outputStacks, boolean isRemove) {
-        return outputStacks.stream().anyMatch(stack -> hasStack(stack, inputStacks, isRemove));
+    public static ItemStack hasStacks(List<ItemStack> inputStacks, List<ItemStack> outputStacks, boolean isRemove) {
+        return outputStacks.stream().filter(stack -> isNotEmpty(hasStack(stack, inputStacks, isRemove))).findFirst().orElse(ItemStack.EMPTY);
     }
 
-    public static boolean hasStack(ItemStack stack, List<ItemStack> stacks, boolean isRemove) {
+    public static ItemStack hasStack(ItemStack stack, List<ItemStack> stacks, boolean isRemove) {
         for (ItemStack stackInSlot : stacks) {
             if (stackInSlot.isEmpty()) continue;
             if (stackInSlot.isItemEqual(stack)) {
                 if (stackInSlot.getCount() >= stack.getCount()) {
+                    ItemStack copy = stackInSlot.copy();
                     if (isRemove) stackInSlot.shrink(stack.getCount());
-                    return true;
+                    return copy;
                 }
             }
         }
-        return false;
+        return ItemStack.EMPTY;
     }
 
 }

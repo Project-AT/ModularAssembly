@@ -1,33 +1,32 @@
 package ink.ikx.modularassembly.utils.assembly;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MachineAssemblyManager {
 
-    private static final List<MachineAssembly> MACHINE_ASSEMBLY_LIST = Lists.newArrayList();
+    private static final Set<MachineAssembly> MACHINE_ASSEMBLY_LIST = Sets.newHashSet();
 
-    public static boolean addMachineAssembly(MachineAssembly machineAssembly) {
-        if (!MACHINE_ASSEMBLY_LIST.contains(machineAssembly)) {
-            MACHINE_ASSEMBLY_LIST.add(machineAssembly);
-            return true;
-        }
-        return false;
+    public static void addMachineAssembly(MachineAssembly machineAssembly) {
+        MACHINE_ASSEMBLY_LIST.add(machineAssembly);
     }
 
-    public static MachineAssembly getMachineAssemblyFromBlockPos(BlockPos pos) {
-        return MACHINE_ASSEMBLY_LIST.stream().filter(a -> a.getPos().equals(pos)).findFirst().orElse(null);
+    public static boolean checkMachineExist(MachineAssembly machineAssembly) {
+        return MACHINE_ASSEMBLY_LIST.contains(machineAssembly);
     }
 
-    public static List<MachineAssembly> getMachineAssemblyListFromPlayer(EntityPlayer player) {
-        return MACHINE_ASSEMBLY_LIST.stream().filter(a -> a.getPlayer().equals(player)).collect(Collectors.toList());
+    public static Set<MachineAssembly> getMachineAssemblyListFromPlayer(EntityPlayer player) {
+        return MACHINE_ASSEMBLY_LIST.stream().filter(a -> a.getPlayer().equals(player)).collect(Collectors.toSet());
     }
 
-    public static List<MachineAssembly> getMachineAssemblyList() {
+    public static void removeMachineAssembly(MachineAssembly machineAssembly) {
+        MACHINE_ASSEMBLY_LIST.remove(machineAssembly);
+    }
+
+    public static Set<MachineAssembly> getMachineAssemblyList() {
         return MACHINE_ASSEMBLY_LIST;
     }
 

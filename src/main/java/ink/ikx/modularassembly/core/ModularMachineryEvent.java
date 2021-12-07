@@ -3,6 +3,7 @@ package ink.ikx.modularassembly.core;
 import hellfirepvp.modularmachinery.common.lib.ItemsMM;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.TileMachineController;
+import ink.ikx.modularassembly.utils.CollUtils;
 import ink.ikx.modularassembly.utils.assembly.MachineAssembly;
 import ink.ikx.modularassembly.utils.assembly.MachineAssemblyManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,9 +13,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+
+import java.util.Set;
 
 @Mod.EventBusSubscriber
 public class ModularMachineryEvent {
@@ -46,17 +52,32 @@ public class ModularMachineryEvent {
                     return;
                 }
                 MachineAssembly Machine = new MachineAssembly(blockPos, player, blueprintMachine.getPattern().getPattern());
-                if (MachineAssemblyManager.addMachineAssembly(Machine)) {
+                if (MachineAssemblyManager.checkMachineExist(Machine)) {
                     player.sendMessage(new TextComponentString("Machine assembly added!"));
                     return;
                 }
                 if (!Machine.isAllItemsContains()) {
-                    player.sendMessage(new TextComponentString("Machine assembly success!"));
+                    player.sendMessage(new TextComponentString("Not all items are in the inventory!"));
                 } else {
-                    player.sendMessage(new TextComponentString("Machine assembly failed!"));
+                    MachineAssemblyManager.addMachineAssembly(Machine);
+                    player.sendMessage(new TextComponentString("Machine assembly add!"));
                 }
                 event.setCanceled(true);
             }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        EntityPlayer player = event.player;
+        World world = player.world;
+        if (event.phase == TickEvent.Phase.START || event.side.isClient() ||
+                player instanceof FakePlayer || world.getWorldTime() % 5 != 0) return;
+
+        Set<MachineAssembly> machineAssemblyListFromPlayer = MachineAssemblyManager.getMachineAssemblyListFromPlayer(player);
+
+        if (CollUtils.isNotEmpty(machineAssemblyListFromPlayer)) {
+            machineAssemblyListFromPlayer.stream().filter(MachineAssembly::isNotAir).forEach(MachineAssembly::build);
         }
     }
 

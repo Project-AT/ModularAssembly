@@ -22,15 +22,6 @@ minecraft {
     runDir = "run"
     mappings = project.mcpVersion
     makeObfSourceJar = false
-
-    def args = [
-            "-Dmixin.hotSwap=true",
-            "-Dmixin.debug.export=true",
-            "-Dmixin.checks.interfaces=true"
-    ]
-
-    clientJvmArgs.addAll(args)
-    serverJvmArgs.addAll(args)
 }
 
 repositories {

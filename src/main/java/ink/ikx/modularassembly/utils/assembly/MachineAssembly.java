@@ -4,8 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.util.BlockArray.BlockInformation;
-import hellfirepvp.modularmachinery.common.util.MiscUtils;
-import ink.ikx.modularassembly.utils.CollUtils;
+import ink.ikx.modularassembly.utils.MiscUtils;
 import ink.ikx.modularassembly.utils.StackUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -18,7 +17,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.FluidUtil;
@@ -49,7 +47,7 @@ public class MachineAssembly {
             if (listSamplesFromInfo.size() == 1 && listSamplesFromInfo.get(0).getItem() == Items.APPLE) {
                 return false;
             }
-            if (CollUtils.isNotEmpty(listSamplesFromInfo)) {
+            if (MiscUtils.isNotEmpty(listSamplesFromInfo)) {
                 needFindStacks.put(entry.getKey(), listSamplesFromInfo);
             }
         }
@@ -67,7 +65,7 @@ public class MachineAssembly {
             List<ItemStack> listSamplesFromInfo = this.getListSamplesFromInfo(next);
             if (listSamplesFromInfo.size() == 1 && listSamplesFromInfo.get(0).getItem() == Items.APPLE) return;
 
-            if (CollUtils.isNotEmpty(listSamplesFromInfo)) {
+            if (MiscUtils.isNotEmpty(listSamplesFromInfo)) {
                 ItemStack stack = StackUtils.hasStacks(player.inventory.mainInventory, listSamplesFromInfo, true);
                 if (StackUtils.isNotEmpty(stack)) {
                     //noinspection deprecation
@@ -80,15 +78,16 @@ public class MachineAssembly {
                     getWorld().setBlockState(getOffsetByFacing(next.getKey()), state);
                     getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
                     iterator.remove();
-                    break;
                 } else {
-                    player.sendMessage(new TextComponentString("Not enough blocks for building."));
+                    player.sendMessage(MiscUtils.i18nMessage(4));
+                    MachineAssemblyManager.removeMachineAssembly(this);
                 }
+                break;
             }
         }
 
         if (pattern.isEmpty()) {
-            player.sendMessage(new TextComponentString("Machine Assembly: Success!"));
+            player.sendMessage(MiscUtils.i18nMessage(5));
             MachineAssemblyManager.removeMachineAssembly(this);
         }
 
@@ -97,7 +96,7 @@ public class MachineAssembly {
     public void buildWithCreative() {
         pattern.forEach((k, v) -> getWorld().setBlockState(getOffsetByFacing(k), v.getSampleState()));
         getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        player.sendMessage(new TextComponentString("Machine Assembly: Success!"));
+        player.sendMessage(MiscUtils.i18nMessage(5));
     }
 
     private List<ItemStack> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
@@ -136,7 +135,7 @@ public class MachineAssembly {
         EnumFacing facing = EnumFacing.NORTH;
         EnumFacing controllerFacing = player.world.getBlockState(pos).getValue(BlockController.FACING);
         while (facing != controllerFacing) {
-            blockPos = MiscUtils.rotateYCCW(blockPos);
+            blockPos = hellfirepvp.modularmachinery.common.util.MiscUtils.rotateYCCW(blockPos);
             facing = facing.rotateYCCW();
         }
         return pos.add(blockPos);

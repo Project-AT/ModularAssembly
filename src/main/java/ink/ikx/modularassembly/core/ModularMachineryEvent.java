@@ -3,7 +3,7 @@ package ink.ikx.modularassembly.core;
 import hellfirepvp.modularmachinery.common.lib.ItemsMM;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.TileMachineController;
-import ink.ikx.modularassembly.utils.CollUtils;
+import ink.ikx.modularassembly.utils.MiscUtils;
 import ink.ikx.modularassembly.utils.assembly.MachineAssembly;
 import ink.ikx.modularassembly.utils.assembly.MachineAssemblyManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,7 +11,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -48,21 +47,19 @@ public class ModularMachineryEvent {
             } else if (stack.getItem().equals(Items.STICK)) {
                 DynamicMachine blueprintMachine = controller.getBlueprintMachine();
                 if (blueprintMachine == null) {
-                    player.sendMessage(new TextComponentString("No blueprint machine found!"));
+                    player.sendMessage(MiscUtils.i18nMessage(1));
                     return;
                 }
                 MachineAssembly Machine = new MachineAssembly(blockPos, player, blueprintMachine.getPattern().getPattern());
                 if (MachineAssemblyManager.checkMachineExist(Machine)) {
-                    player.sendMessage(new TextComponentString("Machine assembly added!"));
+                    player.sendMessage(MiscUtils.i18nMessage(2));
                     return;
                 }
                 if (isPlayerNotCreative(player)) {
-                    if (!Machine.isAllItemsContains()) {
-                        player.sendMessage(new TextComponentString("Not all items are in the inventory!"));
-                    } else {
+                    if (!Machine.isAllItemsContains())
+                        player.sendMessage(MiscUtils.i18nMessage(4));
+                    else
                         MachineAssemblyManager.addMachineAssembly(Machine);
-                        player.sendMessage(new TextComponentString("Machine assembly add!"));
-                    }
                 } else {
                     Machine.buildWithCreative();
                 }
@@ -80,7 +77,7 @@ public class ModularMachineryEvent {
 
         Set<MachineAssembly> machineAssemblyListFromPlayer = MachineAssemblyManager.getMachineAssemblyListFromPlayer(player);
 
-        if (CollUtils.isNotEmpty(machineAssemblyListFromPlayer)) {
+        if (MiscUtils.isNotEmpty(machineAssemblyListFromPlayer)) {
             machineAssemblyListFromPlayer.stream().filter(MachineAssembly::isFilter).forEach(MachineAssembly::build);
         }
     }

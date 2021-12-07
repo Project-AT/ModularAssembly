@@ -15,18 +15,18 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.Set;
 
-@Mod.EventBusSubscriber
 public class ModularMachineryEvent {
 
+    public static ModularMachineryEvent INSTANCE = new ModularMachineryEvent();
+
     @SubscribeEvent
-    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+    public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         World world = event.getWorld();
         BlockPos blockPos = event.getPos();
         ItemStack stack = event.getItemStack();
@@ -68,7 +68,7 @@ public class ModularMachineryEvent {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         EntityPlayer player = event.player;
         World world = player.world;
         if (event.phase == TickEvent.Phase.START || event.side.isClient() ||
@@ -81,11 +81,11 @@ public class ModularMachineryEvent {
         }
     }
 
-    private static ItemStack getBlueprint(TileMachineController controller) {
+    private ItemStack getBlueprint(TileMachineController controller) {
         return controller.getInventory().getStackInSlot(TileMachineController.BLUEPRINT_SLOT);
     }
 
-    private static boolean isPlayerNotCreative(EntityPlayer player) {
+    private boolean isPlayerNotCreative(EntityPlayer player) {
         return !player.isCreative();
     }
 

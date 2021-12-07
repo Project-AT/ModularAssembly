@@ -1,6 +1,9 @@
 package ink.ikx.modularassembly;
 
+import ink.ikx.modularassembly.core.ModularMachineryEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(
         modid = Main.MOD_ID,
@@ -15,5 +18,13 @@ public class Main {
 
     @Mod.Instance(MOD_ID)
     public static Main INSTANCE;
+
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        // I know it's a bit dumb
+        // But if I don't do this, there nothing in the main class,
+        // and it feels even weirder
+        MinecraftForge.EVENT_BUS.register(ModularMachineryEvent.INSTANCE);
+    }
 
 }

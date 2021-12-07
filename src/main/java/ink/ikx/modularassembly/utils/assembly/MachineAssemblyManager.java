@@ -26,8 +26,4 @@ public class MachineAssemblyManager {
         MACHINE_ASSEMBLY_LIST.remove(machineAssembly);
     }
 
-    public static Set<MachineAssembly> getMachineAssemblyList() {
-        return MACHINE_ASSEMBLY_LIST;
-    }
-
 }

@@ -136,10 +136,6 @@ public class MachineAssembly {
         return player;
     }
 
-    public BlockPos getPos() {
-        return pos;
-    }
-
     public World getWorld() {
         return player.world;
     }

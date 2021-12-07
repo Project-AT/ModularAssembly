@@ -56,11 +56,15 @@ public class ModularMachineryEvent {
                     player.sendMessage(new TextComponentString("Machine assembly added!"));
                     return;
                 }
-                if (!Machine.isAllItemsContains()) {
-                    player.sendMessage(new TextComponentString("Not all items are in the inventory!"));
+                if (isPlayerNotCreative(player)) {
+                    if (!Machine.isAllItemsContains()) {
+                        player.sendMessage(new TextComponentString("Not all items are in the inventory!"));
+                    } else {
+                        MachineAssemblyManager.addMachineAssembly(Machine);
+                        player.sendMessage(new TextComponentString("Machine assembly add!"));
+                    }
                 } else {
-                    MachineAssemblyManager.addMachineAssembly(Machine);
-                    player.sendMessage(new TextComponentString("Machine assembly add!"));
+                    Machine.buildWithCreative();
                 }
                 event.setCanceled(true);
             }

@@ -81,15 +81,23 @@ public class MachineAssembly {
                     getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
                     iterator.remove();
                     break;
+                } else {
+                    player.sendMessage(new TextComponentString("Not enough blocks for building."));
                 }
             }
         }
 
         if (pattern.isEmpty()) {
-            player.sendMessage(new TextComponentString("&a&lMachine Assembly: &a&lSuccess!"));
+            player.sendMessage(new TextComponentString("Machine Assembly: Success!"));
             MachineAssemblyManager.removeMachineAssembly(this);
         }
 
+    }
+
+    public void buildWithCreative() {
+        pattern.forEach((k, v) -> getWorld().setBlockState(getOffsetByFacing(k), v.getSampleState()));
+        getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        player.sendMessage(new TextComponentString("Machine Assembly: Success!"));
     }
 
     private List<ItemStack> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
@@ -114,7 +122,9 @@ public class MachineAssembly {
     }
 
     public boolean isFilter() {
-        return getWorld().getBlockState(pos).getMaterial() != Material.AIR;
+        boolean toReturn = getWorld().isBlockLoaded(pos) && !getWorld().isAirBlock(pos);
+        if (!toReturn) MachineAssemblyManager.removeMachineAssembly(this);
+        return toReturn;
     }
 
     private boolean isNotLiquid(IBlockState state) {

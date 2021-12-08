@@ -10,6 +10,7 @@ import ink.ikx.modularassembly.utils.assembly.MachineAssemblyManager;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -38,6 +39,9 @@ public class ModularMachineryEvent {
 
         if (world.isRemote) return;
 
+        Item item = Item.getByNameOrId(Configuration.itemName);
+        if (item == null) item = Items.STICK;
+
         if (tileEntity instanceof TileMachineController && !player.isSneaking()) {
             TileMachineController controller = (TileMachineController) tileEntity;
             if (stack.getItem().equals(ItemsMM.blueprint)) {
@@ -48,7 +52,7 @@ public class ModularMachineryEvent {
                     controller.getInventory().setStackInSlot(TileMachineController.BLUEPRINT_SLOT, copy);
                 }
                 event.setCanceled(true);
-            } else if (stack.getItem().equals(Items.STICK)) {
+            } else if (stack.isItemEqual(new ItemStack(item, 1, Configuration.itemMeta))) {
                 if (Main.instance.isMoCLoaded() && block instanceof BlockMMController) {
                     BlockMMController blockMMController = (BlockMMController) block;
                     List<DynamicMachine> machineList = blockMMController.getAssociatedMachines();

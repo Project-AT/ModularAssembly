@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.util.BlockArray.BlockInformation;
+import ink.ikx.modularassembly.utils.FluidUtils;
 import ink.ikx.modularassembly.utils.MiscUtils;
 import ink.ikx.modularassembly.utils.StackUtils;
 import net.minecraft.block.Block;
@@ -58,10 +59,15 @@ public class MachineAssembly {
                 .allMatch(s -> StackUtils.isNotEmpty(StackUtils.hasStacks(mainInventoryCopy, s, true)));
     }
 
-    public void build() {
+    public void assembly() {
         Iterator<Map.Entry<BlockPos, BlockInformation>> iterator = pattern.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<BlockPos, BlockInformation> next = iterator.next();
+            BlockPos offsetByFacing = getOffsetByFacing(next.getKey());
+            if (next.getValue().matchesState(getWorld().getBlockState(offsetByFacing))) {
+                iterator.remove();
+                continue;
+            }
             List<ItemStack> listSamplesFromInfo = this.getListSamplesFromInfo(next);
             if (listSamplesFromInfo.size() == 1 && listSamplesFromInfo.get(0).getItem() == Items.APPLE) return;
 
@@ -70,16 +76,15 @@ public class MachineAssembly {
                 if (StackUtils.isNotEmpty(stack)) {
                     //noinspection deprecation
                     IBlockState state = Block.getBlockFromItem(stack.getItem()).getStateFromMeta(stack.getMetadata());
-                    if (FluidUtil.getFluidHandler(stack) != null) {
+                    if (FluidUtils.isFluidHandler(stack)) {
+                        player.addItemStackToInventory(new ItemStack(Items.BUCKET));
                         state = Objects.requireNonNull(FluidUtil.getFluidContained(stack)).getFluid().getBlock().getDefaultState();
-                        if (stack.getItem() == Items.WATER_BUCKET || stack.getItem() == Items.LAVA_BUCKET)
-                            player.inventory.addItemStackToInventory(new ItemStack(Items.BUCKET));
                     }
-                    getWorld().setBlockState(getOffsetByFacing(next.getKey()), state);
+                    getWorld().setBlockState(offsetByFacing, state);
                     getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
                     iterator.remove();
                 } else {
-                    player.sendMessage(MiscUtils.i18nMessage(4));
+                    player.sendMessage(MiscUtils.translate(4));
                     MachineAssemblyManager.removeMachineAssembly(this);
                 }
                 break;
@@ -87,7 +92,7 @@ public class MachineAssembly {
         }
 
         if (pattern.isEmpty()) {
-            player.sendMessage(MiscUtils.i18nMessage(5));
+            player.sendMessage(MiscUtils.translate(5));
             MachineAssemblyManager.removeMachineAssembly(this);
         }
 
@@ -96,7 +101,7 @@ public class MachineAssembly {
     public void buildWithCreative() {
         pattern.forEach((k, v) -> getWorld().setBlockState(getOffsetByFacing(k), v.getSampleState()));
         getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        player.sendMessage(MiscUtils.i18nMessage(5));
+        player.sendMessage(MiscUtils.translate(5));
     }
 
     private List<ItemStack> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
@@ -121,7 +126,7 @@ public class MachineAssembly {
     }
 
     public boolean isFilter() {
-        boolean toReturn = getWorld().isBlockLoaded(pos) && !getWorld().isAirBlock(pos);
+        boolean toReturn = getWorld().isBlockLoaded(pos) && !getWorld().isAirBlock(pos) && Objects.nonNull(player);
         if (!toReturn) MachineAssemblyManager.removeMachineAssembly(this);
         return toReturn;
     }

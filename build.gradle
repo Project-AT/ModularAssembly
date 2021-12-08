@@ -13,20 +13,22 @@ buildscript {
 
 apply plugin: "net.minecraftforge.gradle.forge"
 
-group = modVersion
-version = mcVersion
-archivesBaseName = modId
+group = author
+version = mcVersion + "-" + modVersion
+archivesBaseName = modName
 
 minecraft {
-    version = project.forgeVersion
     runDir = "run"
-    mappings = project.mcpVersion
     makeObfSourceJar = false
+    mappings = project.mcpVersion
+    version = project.forgeVersion
 }
 
 repositories {
     mavenCentral()
     maven { url = "https://maven.tterrag.com/" } //Top
+    maven { url = "https://www.cursemaven.com" } // ModularController
+    maven { url = "https://maven.blamejared.com" } //CraftTweaker
     maven { url = "https://maven.hellfiredev.net" } //ModularMachinery
     maven { url = "https://dvs1.progwml6.com/files/maven" } //Jei
 }
@@ -35,6 +37,9 @@ dependencies {
     runtime "mezz.jei:jei_${mcVersion}:${jeiVersion}"
     runtime "mcjty.theoneprobe:TheOneProbe-${mcShort}:${topVersion}"
 
+    deobfCompile "curse.maven:mixinbooter-${mbVersion}"
+    deobfCompile "curse.maven:modular-controller-${mocVersion}"
+    deobfCompile "CraftTweaker2:CraftTweaker2-MC1120-Main:${mcShort}-${crtVersion}"
     deobfCompile "hellfirepvp.modularmachinery:modularmachinery:${mcVersion}-${mmVersion}"
 }
 

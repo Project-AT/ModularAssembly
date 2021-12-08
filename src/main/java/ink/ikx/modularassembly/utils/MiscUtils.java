@@ -1,10 +1,11 @@
 package ink.ikx.modularassembly.utils;
 
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.util.text.TextComponentTranslation;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 public class MiscUtils {
 
@@ -12,9 +13,11 @@ public class MiscUtils {
         return collection != null && !collection.isEmpty();
     }
 
-    @SuppressWarnings("deprecation")
-    public static ITextComponent i18nMessage(int mark) {
-        return new TextComponentString(I18n.translateToLocal("tips.tip" + mark));
+    public static ITextComponent translate(int mark) {
+        return new TextComponentTranslation("tips.tip" + mark);
     }
 
+    public static boolean areNull(Object... objs) {
+        return Arrays.stream(objs).anyMatch(Objects::isNull);
+    }
 }

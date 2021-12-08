@@ -1,29 +1,28 @@
 package ink.ikx.modularassembly.utils;
 
-import hellfirepvp.modularmachinery.common.lib.BlocksMM;
+import hellfirepvp.modularmachinery.common.block.BlockController;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
 import java.util.List;
-import java.util.Objects;
 
 public class StackUtils {
 
     public static boolean isNotEmpty(ItemStack stack) {
-        return !stack.isEmpty();
+        return !stack.isEmpty() && stack.getItem() != Items.MILK_BUCKET;
     }
 
     public static boolean isStackFilter(ItemStack stack) {
-        return isNotEmpty(stack) && stack.getItem() != Item.getItemFromBlock(BlocksMM.blockController);
+        return isNotEmpty(stack) && !(Block.getBlockFromItem(stack.getItem()) instanceof BlockController);
     }
 
     public static ItemStack getStackFromBlockState(IBlockState state) {
@@ -49,18 +48,15 @@ public class StackUtils {
         for (ItemStack stackInSlot : stacks) {
             ItemStack copy = stackInSlot.copy();
             if (stackInSlot.isEmpty()) continue;
-            if (stackInSlot.isItemEqual(stack)) {
-                if (stackInSlot.getCount() >= stack.getCount()) {
+            if (FluidUtils.areFluidHandler(stack, stackInSlot)) {
+                if (FluidUtils.equalsFluidFromStack(stackInSlot, stack)) {
+                    if (!(stackInSlot.getItem() instanceof ItemBucket)) return new ItemStack(Items.MILK_BUCKET);
                     if (isRemove) stackInSlot.shrink(stack.getCount());
                     return copy;
                 }
-            } else if (FluidUtil.getFluidHandler(stack) != null && FluidUtil.getFluidHandler(stackInSlot) != null) {
-                IFluidHandlerItem handler = FluidUtil.getFluidHandler(stack);
-                FluidStack fluidStack = FluidUtil.getFluidContained(stackInSlot);
-                FluidStack fluidStack_ = FluidUtil.getFluidContained(stack);
-
-                if (fluidStack != null && Objects.requireNonNull(fluidStack).containsFluid(fluidStack_)) {
-                    if (isRemove) Objects.requireNonNull(handler).drain(fluidStack, true);
+            } else if (stackInSlot.isItemEqual(stack)) {
+                if (stackInSlot.getCount() >= stack.getCount()) {
+                    if (isRemove) stackInSlot.shrink(stack.getCount());
                     return copy;
                 }
             }

@@ -77,7 +77,8 @@ public class ModularMachineryEvent {
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         EntityPlayer player = event.player;
         World world = player.world;
-        if (event.phase == TickEvent.Phase.START || event.side.isClient() || world.getWorldTime() % 5 != 0) return;
+        if (event.phase == TickEvent.Phase.START || event.side.isClient() || world.getWorldTime() % Configuration.tickBlock != 0)
+            return;
 
         Set<MachineAssembly> machineAssemblyListFromPlayer = MachineAssemblyManager.getMachineAssemblyListFromPlayer(player);
 

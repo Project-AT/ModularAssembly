@@ -12,4 +12,7 @@ public class Configuration {
     @Config.Comment("Set the Item's meta, e.g. 0")
     public static int itemMeta = 0;
 
+    @Config.Comment("Set how many ticks to assemble the block once")
+    public static int tickBlock = 5;
+
 }

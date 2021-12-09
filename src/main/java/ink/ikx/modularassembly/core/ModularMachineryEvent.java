@@ -59,9 +59,9 @@ public class ModularMachineryEvent {
                     for (int i = 0; i < machineList.size(); i++) {
                         DynamicMachine machine = machineList.get(i);
                         if ((machineList.size() - 1) == i) {
-                            assemblyBefore(machine, player, blockPos, true);
+                            assemblyBefore(machine, player, blockPos, false);
                         } else {
-                            if (assemblyBefore(machine, player, blockPos, false)) break;
+                            if (assemblyBefore(machine, player, blockPos, true)) break;
                         }
                     }
                 } else {

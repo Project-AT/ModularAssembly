@@ -2,6 +2,7 @@ package ink.ikx.modularassembly.utils.assembly;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.realmsclient.util.Pair;
 import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.util.BlockArray.BlockInformation;
 import ink.ikx.modularassembly.utils.FluidUtils;
@@ -44,7 +45,7 @@ public class MachineAssembly {
         Map<BlockPos, List<ItemStack>> needFindStacks = Maps.newHashMap();
 
         for (Map.Entry<BlockPos, BlockInformation> entry : pattern.entrySet()) {
-            List<ItemStack> listSamplesFromInfo = this.getListSamplesFromInfo(entry);
+            List<ItemStack> listSamplesFromInfo = this.getListSamplesFromInfo(entry).second();
             if (listSamplesFromInfo.size() == 1 && listSamplesFromInfo.get(0).getItem() == Items.APPLE) {
                 return false;
             }
@@ -68,14 +69,16 @@ public class MachineAssembly {
                 iterator.remove();
                 continue;
             }
-            List<ItemStack> listSamplesFromInfo = this.getListSamplesFromInfo(next);
-            if (listSamplesFromInfo.size() == 1 && listSamplesFromInfo.get(0).getItem() == Items.APPLE) return;
+            Pair<List<IBlockState>, List<ItemStack>> listSamplesFromInfo = this.getListSamplesFromInfo(next);
+            if (listSamplesFromInfo.first() == null) return;
 
-            if (MiscUtils.isNotEmpty(listSamplesFromInfo)) {
-                ItemStack stack = StackUtils.hasStacks(player.inventory.mainInventory, listSamplesFromInfo, true);
+            if (MiscUtils.isNotEmpty(listSamplesFromInfo.second())) {
+                ItemStack stack = StackUtils.hasStacks(player.inventory.mainInventory, listSamplesFromInfo.second(), true);
                 if (StackUtils.isNotEmpty(stack)) {
-                    //noinspection deprecation
-                    IBlockState state = Block.getBlockFromItem(stack.getItem()).getStateFromMeta(stack.getMetadata());
+                    int index = getIndex(listSamplesFromInfo.second(), stack);
+                    if (index == -1) return;
+
+                    IBlockState state = listSamplesFromInfo.first().get(index);
                     if (FluidUtils.isFluidHandler(stack)) {
                         player.addItemStackToInventory(new ItemStack(Items.BUCKET));
                         state = Objects.requireNonNull(FluidUtil.getFluidContained(stack)).getFluid().getBlock().getDefaultState();
@@ -104,25 +107,33 @@ public class MachineAssembly {
         player.sendMessage(MiscUtils.translate(5));
     }
 
-    private List<ItemStack> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
+    private int getIndex(List<ItemStack> stacks, ItemStack stack) {
+        for (int i = 0; i < stacks.size(); i++) {
+            if (stacks.get(i).isItemEqual(stack))
+                return i;
+        }
+        return -1;
+    }
+
+    private Pair<List<IBlockState>, List<ItemStack>> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
         IBlockState state = player.world.getBlockState(getOffsetByFacing(entry.getKey()));
-        List<ItemStack> toReturn = Lists.newArrayList(new ItemStack(Items.APPLE));
+        List<ItemStack> toReturn = Lists.newArrayList();
         if (!entry.getValue().matchesState(state) && state.getMaterial() != Material.AIR && isNotLiquid(state))
-            return toReturn;
+            return Pair.of(null, toReturn);
         try {
             Field fileSamples = entry.getValue().getClass().getDeclaredField("samples");
             fileSamples.setAccessible(true);
             //noinspection unchecked
             List<IBlockState> samples = (List<IBlockState>) fileSamples.get(entry.getValue());
-            toReturn = samples.stream()
-                    .map(StackUtils::getStackFromBlockState)
-                    .filter(StackUtils::isStackFilter)
-                    .map(ItemStack::copy)
-                    .collect(Collectors.toList());
+            for (IBlockState sample : samples) {
+                ItemStack stack = StackUtils.getStackFromBlockState(sample);
+                if (StackUtils.isStackFilter(stack)) toReturn.add(stack);
+            }
+            return Pair.of(samples, toReturn);
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
-        return toReturn;
+        return Pair.of(null, toReturn);
     }
 
     public boolean isFilter() {

@@ -37,7 +37,7 @@ public class StackUtils {
                 return new ItemStack(Items.WATER_BUCKET);
             }
         }
-        return new ItemStack(Item.getItemFromBlock(block), 1, block.getMetaFromState(state));
+        return new ItemStack(Item.getItemFromBlock(block), 1, block.damageDropped(state));
     }
 
     public static ItemStack hasStacks(List<ItemStack> inputStacks, List<ItemStack> outputStacks, boolean isRemove) {

@@ -9,7 +9,6 @@ import ink.ikx.modularassembly.utils.FluidUtils;
 import ink.ikx.modularassembly.utils.MiscUtils;
 import ink.ikx.modularassembly.utils.StackUtils;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -19,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.FluidUtil;
 
@@ -136,7 +136,7 @@ public class MachineAssembly {
     private Pair<List<IBlockState>, List<ItemStack>> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
         IBlockState state = player.world.getBlockState(pos.add(entry.getKey()));
         List<ItemStack> toReturn = Lists.newArrayList();
-            if (!entry.getValue().matchesState(state) && state.getMaterial() != Material.AIR && isNotLiquid(state))
+        if (!entry.getValue().matchesState(state) && isNotAirOrCanReplaced(pos.add(entry.getKey())) && isNotLiquid(state))
             return Pair.of(null, toReturn);
         try {
             Field fileSamples = entry.getValue().getClass().getDeclaredField("samples");
@@ -155,9 +155,14 @@ public class MachineAssembly {
     }
 
     public boolean isFilter() {
-        boolean toReturn = getWorld().isBlockLoaded(pos) && !getWorld().isAirBlock(pos) && Objects.nonNull(player);
+        boolean toReturn = getWorld().isBlockLoaded(pos) && isNotAirOrCanReplaced(pos) && Objects.nonNull(player);
         if (!toReturn) MachineAssemblyManager.removeMachineAssembly(this);
         return toReturn;
+    }
+
+    private boolean isNotAirOrCanReplaced(BlockPos pos) {
+        return !getWorld().isAirBlock(pos) && !(getWorld().getBlockState(pos).getBlock() instanceof IPlantable
+                        && getWorld().getTileEntity(pos) == null);
     }
 
     private boolean isNotLiquid(IBlockState state) {

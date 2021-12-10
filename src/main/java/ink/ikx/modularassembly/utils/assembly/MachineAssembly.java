@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.realmsclient.util.Pair;
 import hellfirepvp.modularmachinery.common.util.BlockArray.BlockInformation;
+import ink.ikx.modularassembly.core.Configuration;
 import ink.ikx.modularassembly.utils.FluidUtils;
 import ink.ikx.modularassembly.utils.MiscUtils;
 import ink.ikx.modularassembly.utils.StackUtils;
@@ -67,6 +68,12 @@ public class MachineAssembly {
                 iterator.remove();
                 continue;
             }
+
+            if (next.getValue().matchingTag != null && Configuration.skipBlockContainNBT) {
+                iterator.remove();
+                continue;
+            }
+
             Pair<List<IBlockState>, List<ItemStack>> listSamplesFromInfo = this.getListSamplesFromInfo(next);
             if (listSamplesFromInfo.first() == null) {
                 player.sendMessage(MiscUtils.translate(6));
@@ -74,12 +81,12 @@ public class MachineAssembly {
                 return;
             }
 
-            if (MiscUtils.isNotEmpty(listSamplesFromInfo.second())) {
+            if (MiscUtils.isNotEmpty(listSamplesFromInfo.second()) || !Configuration.needAllBlocks) {
                 ItemStack stack = StackUtils.hasStacks(player.inventory.mainInventory, listSamplesFromInfo.second(), true);
                 if (StackUtils.isNotEmpty(stack)) {
                     int index = getIndex(listSamplesFromInfo.second(), stack);
                     if (index == -1) {
-                        player.sendMessage(MiscUtils.translate(6));
+                        player.sendMessage(MiscUtils.translate(3));
                         MachineAssemblyManager.removeMachineAssembly(this);
                         return;
                     }

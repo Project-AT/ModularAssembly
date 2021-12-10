@@ -1,7 +1,7 @@
 [
     {
         "modid": "modularassembly",
-        "name": "Modularassembly",
+        "name": "Modular Assembly",
         "description": "Modular Assembly is an addon for Modular Machinery.It makes it easy for players to assembly modular machines with one click.",
         "version": "${version}",
         "mcversion": "${mcversion}",

@@ -18,7 +18,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -90,6 +93,13 @@ public class ModularMachineryEvent {
         }
     }
 
+    @SubscribeEvent
+    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (event.getModID().equals(Main.MOD_ID)) {
+            ConfigManager.sync(Main.MOD_ID, Config.Type.INSTANCE);
+        }
+    }
+
     private boolean assemblyBefore(DynamicMachine machine, EntityPlayer player, BlockPos pos, boolean isMoc) {
         if (machine == null) {
             if (!isMoc) player.sendMessage(MiscUtils.translate(1));
@@ -105,7 +115,7 @@ public class ModularMachineryEvent {
             return false;
         }
         if (isPlayerNotCreative(player)) {
-            if (!Machine.isAllItemsContains()) {
+            if (!Machine.isAllItemsContains() && Configuration.needAllBlocks) {
                 if (!isMoc) player.sendMessage(MiscUtils.translate(3));
                 return false;
             } else

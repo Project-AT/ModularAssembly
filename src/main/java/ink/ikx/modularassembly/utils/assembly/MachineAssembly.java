@@ -3,7 +3,6 @@ package ink.ikx.modularassembly.utils.assembly;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.realmsclient.util.Pair;
-import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.util.BlockArray.BlockInformation;
 import ink.ikx.modularassembly.utils.FluidUtils;
 import ink.ikx.modularassembly.utils.MiscUtils;
@@ -16,7 +15,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -64,19 +62,27 @@ public class MachineAssembly {
         Iterator<Map.Entry<BlockPos, BlockInformation>> iterator = pattern.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<BlockPos, BlockInformation> next = iterator.next();
-            BlockPos offsetByFacing = getOffsetByFacing(next.getKey());
+            BlockPos offsetByFacing = pos.add(next.getKey());
             if (next.getValue().matchesState(getWorld().getBlockState(offsetByFacing))) {
                 iterator.remove();
                 continue;
             }
             Pair<List<IBlockState>, List<ItemStack>> listSamplesFromInfo = this.getListSamplesFromInfo(next);
-            if (listSamplesFromInfo.first() == null) return;
+            if (listSamplesFromInfo.first() == null) {
+                player.sendMessage(MiscUtils.translate(6));
+                MachineAssemblyManager.removeMachineAssembly(this);
+                return;
+            }
 
             if (MiscUtils.isNotEmpty(listSamplesFromInfo.second())) {
                 ItemStack stack = StackUtils.hasStacks(player.inventory.mainInventory, listSamplesFromInfo.second(), true);
                 if (StackUtils.isNotEmpty(stack)) {
                     int index = getIndex(listSamplesFromInfo.second(), stack);
-                    if (index == -1) return;
+                    if (index == -1) {
+                        player.sendMessage(MiscUtils.translate(6));
+                        MachineAssemblyManager.removeMachineAssembly(this);
+                        return;
+                    }
 
                     IBlockState state = listSamplesFromInfo.first().get(index);
                     if (FluidUtils.isFluidHandler(stack)) {
@@ -102,7 +108,7 @@ public class MachineAssembly {
     }
 
     public void buildWithCreative() {
-        pattern.forEach((k, v) -> getWorld().setBlockState(getOffsetByFacing(k), v.getSampleState()));
+        pattern.forEach((k, v) -> getWorld().setBlockState(pos.add(k), v.getSampleState()));
         getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
         player.sendMessage(MiscUtils.translate(5));
     }
@@ -116,7 +122,7 @@ public class MachineAssembly {
     }
 
     private Pair<List<IBlockState>, List<ItemStack>> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
-        IBlockState state = player.world.getBlockState(getOffsetByFacing(entry.getKey()));
+        IBlockState state = player.world.getBlockState(pos.add(entry.getKey()));
         List<ItemStack> toReturn = Lists.newArrayList();
         if (!entry.getValue().matchesState(state) && state.getMaterial() != Material.AIR && isNotLiquid(state))
             return Pair.of(null, toReturn);
@@ -145,16 +151,6 @@ public class MachineAssembly {
     private boolean isNotLiquid(IBlockState state) {
         Block block = state.getBlock();
         return !(block instanceof BlockFluidBase) && block != Blocks.WATER && block != Blocks.LAVA;
-    }
-
-    private BlockPos getOffsetByFacing(BlockPos blockPos) {
-        EnumFacing facing = EnumFacing.NORTH;
-        EnumFacing controllerFacing = player.world.getBlockState(pos).getValue(BlockController.FACING);
-        while (facing != controllerFacing) {
-            blockPos = hellfirepvp.modularmachinery.common.util.MiscUtils.rotateYCCW(blockPos);
-            facing = facing.rotateYCCW();
-        }
-        return pos.add(blockPos);
     }
 
     public EntityPlayer getPlayer() {

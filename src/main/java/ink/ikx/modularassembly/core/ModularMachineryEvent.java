@@ -1,8 +1,10 @@
 package ink.ikx.modularassembly.core;
 
+import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.lib.ItemsMM;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.TileMachineController;
+import hellfirepvp.modularmachinery.common.util.BlockArray;
 import ink.ikx.modularassembly.Main;
 import ink.ikx.modularassembly.utils.MiscUtils;
 import ink.ikx.modularassembly.utils.assembly.MachineAssembly;
@@ -13,6 +15,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -92,7 +95,11 @@ public class ModularMachineryEvent {
             if (!isMoc) player.sendMessage(MiscUtils.translate(1));
             return false;
         }
-        MachineAssembly Machine = new MachineAssembly(pos, player, machine.getPattern().getPattern());
+
+        EnumFacing controllerFacing = player.world.getBlockState(pos).getValue(BlockController.FACING);
+        BlockArray blockArray = hellfirepvp.modularmachinery.common.util.MiscUtils.rotateYCCWNorthUntil(machine.getPattern(), controllerFacing);
+        MachineAssembly Machine = new MachineAssembly(pos, player, blockArray.getPattern());
+
         if (MachineAssemblyManager.checkMachineExist(Machine)) {
             player.sendMessage(MiscUtils.translate(2));
             return false;

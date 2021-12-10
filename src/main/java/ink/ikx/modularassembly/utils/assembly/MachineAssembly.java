@@ -78,7 +78,6 @@ public class MachineAssembly {
 
             Pair<List<IBlockState>, List<ItemStack>> listSamplesFromInfo = this.getListSamplesFromInfo(next);
             if (listSamplesFromInfo.first() == null) {
-                MachineAssemblyManager.removeMachineAssembly(this);
                 return;
             }
 
@@ -101,7 +100,6 @@ public class MachineAssembly {
                     getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
                     iterator.remove();
                 } else if (!Configuration.needAllBlocks) {
-                    player.sendMessage(MiscUtils.translate(5));
                     iterator.remove();
                     continue;
                 } else {
@@ -138,7 +136,7 @@ public class MachineAssembly {
     private Pair<List<IBlockState>, List<ItemStack>> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
         IBlockState state = player.world.getBlockState(pos.add(entry.getKey()));
         List<ItemStack> toReturn = Lists.newArrayList();
-        if (!entry.getValue().matchesState(state) && state.getMaterial() != Material.AIR && isNotLiquid(state))
+            if (!entry.getValue().matchesState(state) && state.getMaterial() != Material.AIR && isNotLiquid(state))
             return Pair.of(null, toReturn);
         try {
             Field fileSamples = entry.getValue().getClass().getDeclaredField("samples");

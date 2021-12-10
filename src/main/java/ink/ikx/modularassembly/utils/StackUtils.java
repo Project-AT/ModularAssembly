@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.UniversalBucket;
 
 import java.util.List;
 
@@ -50,9 +51,11 @@ public class StackUtils {
             if (stackInSlot.isEmpty()) continue;
             if (FluidUtils.areFluidHandler(stack, stackInSlot)) {
                 if (FluidUtils.equalsFluidFromStack(stackInSlot, stack)) {
-                    if (!(stackInSlot.getItem() instanceof ItemBucket)) return new ItemStack(Items.MILK_BUCKET);
-                    if (isRemove) stackInSlot.shrink(stack.getCount());
-                    return copy;
+                    if (stackInSlot.getItem() instanceof ItemBucket || stackInSlot.getItem() instanceof UniversalBucket) {
+                        if (isRemove) stackInSlot.shrink(stack.getCount());
+                        return copy;
+                    }
+                    return ItemStack.EMPTY;
                 }
             } else if (stackInSlot.isItemEqual(stack)) {
                 if (stackInSlot.getCount() >= stack.getCount()) {

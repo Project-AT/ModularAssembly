@@ -44,12 +44,14 @@ public class MachineAssembly {
         Map<BlockPos, List<ItemStack>> needFindStacks = Maps.newHashMap();
 
         for (Map.Entry<BlockPos, BlockInformation> entry : pattern.entrySet()) {
-            List<ItemStack> listSamplesFromInfo = this.getListSamplesFromInfo(entry).second();
-            if (listSamplesFromInfo.size() == 1 && listSamplesFromInfo.get(0).getItem() == Items.APPLE) {
+            if (entry.getValue().matchesState(getWorld().getBlockState(pos.add(entry.getKey())))) continue;
+
+            Pair<List<IBlockState>, List<ItemStack>> listSamplesFromInfo = this.getListSamplesFromInfo(entry);
+            if (listSamplesFromInfo.first() == null) {
                 return false;
             }
-            if (MiscUtils.isNotEmpty(listSamplesFromInfo)) {
-                needFindStacks.put(entry.getKey(), listSamplesFromInfo);
+            if (MiscUtils.isNotEmpty(listSamplesFromInfo.second())) {
+                needFindStacks.put(entry.getKey(), listSamplesFromInfo.second());
             }
         }
         List<ItemStack> mainInventoryCopy =
@@ -76,7 +78,6 @@ public class MachineAssembly {
 
             Pair<List<IBlockState>, List<ItemStack>> listSamplesFromInfo = this.getListSamplesFromInfo(next);
             if (listSamplesFromInfo.first() == null) {
-                player.sendMessage(MiscUtils.translate(6));
                 MachineAssemblyManager.removeMachineAssembly(this);
                 return;
             }
@@ -99,6 +100,10 @@ public class MachineAssembly {
                     getWorld().setBlockState(offsetByFacing, state);
                     getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
                     iterator.remove();
+                } else if (!Configuration.needAllBlocks) {
+                    player.sendMessage(MiscUtils.translate(5));
+                    iterator.remove();
+                    continue;
                 } else {
                     player.sendMessage(MiscUtils.translate(4));
                     MachineAssemblyManager.removeMachineAssembly(this);
@@ -115,7 +120,9 @@ public class MachineAssembly {
     }
 
     public void buildWithCreative() {
-        pattern.forEach((k, v) -> getWorld().setBlockState(pos.add(k), v.getSampleState()));
+        pattern.entrySet().stream()
+                .filter(e -> !e.getValue().matchesState(getWorld().getBlockState(pos.add(e.getKey()))))
+                .forEach(e -> getWorld().setBlockState(pos.add(e.getKey()), e.getValue().getSampleState()));
         getWorld().playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
         player.sendMessage(MiscUtils.translate(5));
     }

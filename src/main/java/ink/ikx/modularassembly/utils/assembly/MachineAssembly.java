@@ -8,36 +8,33 @@ import ink.ikx.modularassembly.core.Configuration;
 import ink.ikx.modularassembly.utils.FluidUtils;
 import ink.ikx.modularassembly.utils.MiscUtils;
 import ink.ikx.modularassembly.utils.StackUtils;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.FluidUtil;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MachineAssembly {
 
     private final BlockPos pos;
     private final EntityPlayer player;
-    private final HashMap<BlockPos, BlockInformation> pattern = Maps.newHashMap();
+    private final Map<BlockPos, BlockInformation> pattern;
 
     public MachineAssembly(BlockPos pos, EntityPlayer player, Map<BlockPos, BlockInformation> pattern) {
         this.pos = pos;
         this.player = player;
-        for (Map.Entry<BlockPos, BlockInformation> entry : pattern.entrySet()) {
-            this.pattern.put(new BlockPos(entry.getKey()), entry.getValue().copy());
-        }
+        this.pattern = MiscUtils.sortedAndCopy(pattern);
     }
 
     public boolean isAllItemsContains() {
@@ -84,7 +81,7 @@ public class MachineAssembly {
             if (MiscUtils.isNotEmpty(listSamplesFromInfo.second()) || !Configuration.needAllBlocks) {
                 ItemStack stack = StackUtils.hasStacks(player.inventory.mainInventory, listSamplesFromInfo.second(), true);
                 if (StackUtils.isNotEmpty(stack)) {
-                    int index = getIndex(listSamplesFromInfo.second(), stack);
+                    int index = StackUtils.getIndex(listSamplesFromInfo.second(), stack);
                     if (index == -1) {
                         player.sendMessage(MiscUtils.translate(3));
                         MachineAssemblyManager.removeMachineAssembly(this);
@@ -125,18 +122,10 @@ public class MachineAssembly {
         player.sendMessage(MiscUtils.translate(5));
     }
 
-    private int getIndex(List<ItemStack> stacks, ItemStack stack) {
-        for (int i = 0; i < stacks.size(); i++) {
-            if (stacks.get(i).isItemEqual(stack))
-                return i;
-        }
-        return -1;
-    }
-
     private Pair<List<IBlockState>, List<ItemStack>> getListSamplesFromInfo(Map.Entry<BlockPos, BlockInformation> entry) {
         IBlockState state = player.world.getBlockState(pos.add(entry.getKey()));
         List<ItemStack> toReturn = Lists.newArrayList();
-        if (!entry.getValue().matchesState(state) && isNotAirOrCanReplaced(pos.add(entry.getKey())) && isNotLiquid(state))
+        if (!entry.getValue().matchesState(state) && MiscUtils.isNotAirOrCanReplaced(pos.add(entry.getKey()), getWorld()) && MiscUtils.isNotLiquid(state))
             return Pair.of(null, toReturn);
         try {
             Field fileSamples = entry.getValue().getClass().getDeclaredField("samples");
@@ -155,19 +144,9 @@ public class MachineAssembly {
     }
 
     public boolean isFilter() {
-        boolean toReturn = getWorld().isBlockLoaded(pos) && isNotAirOrCanReplaced(pos) && Objects.nonNull(player);
+        boolean toReturn = getWorld().isBlockLoaded(pos) && MiscUtils.isNotAirOrCanReplaced(pos, getWorld()) && Objects.nonNull(player);
         if (!toReturn) MachineAssemblyManager.removeMachineAssembly(this);
         return toReturn;
-    }
-
-    private boolean isNotAirOrCanReplaced(BlockPos pos) {
-        return !getWorld().isAirBlock(pos) && !(getWorld().getBlockState(pos).getBlock() instanceof IPlantable
-                        && getWorld().getTileEntity(pos) == null);
-    }
-
-    private boolean isNotLiquid(IBlockState state) {
-        Block block = state.getBlock();
-        return !(block instanceof BlockFluidBase) && block != Blocks.WATER && block != Blocks.LAVA;
     }
 
     public EntityPlayer getPlayer() {

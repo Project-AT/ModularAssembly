@@ -45,6 +45,14 @@ public class StackUtils {
         return outputStacks.stream().filter(stack -> isNotEmpty(hasStack(stack, inputStacks, isRemove))).findFirst().orElse(ItemStack.EMPTY);
     }
 
+    public static int getIndex(List<ItemStack> stacks, ItemStack stack) {
+        for (int i = 0; i < stacks.size(); i++) {
+            if (stacks.get(i).isItemEqual(stack))
+                return i;
+        }
+        return -1;
+    }
+
     public static ItemStack hasStack(ItemStack stack, List<ItemStack> stacks, boolean isRemove) {
         for (ItemStack stackInSlot : stacks) {
             ItemStack copy = stackInSlot.copy();

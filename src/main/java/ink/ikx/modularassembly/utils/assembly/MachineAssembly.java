@@ -2,7 +2,6 @@ package ink.ikx.modularassembly.utils.assembly;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mojang.realmsclient.util.Pair;
 import hellfirepvp.modularmachinery.common.util.BlockArray.BlockInformation;
 import ink.ikx.modularassembly.core.Configuration;
 import ink.ikx.modularassembly.utils.FluidUtils;
@@ -17,6 +16,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidUtil;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
@@ -44,11 +44,11 @@ public class MachineAssembly {
             if (entry.getValue().matchesState(getWorld().getBlockState(pos.add(entry.getKey())))) continue;
 
             Pair<List<IBlockState>, List<ItemStack>> listSamplesFromInfo = this.getListSamplesFromInfo(entry);
-            if (listSamplesFromInfo.first() == null) {
+            if (listSamplesFromInfo.getLeft() == null) {
                 return false;
             }
-            if (MiscUtils.isNotEmpty(listSamplesFromInfo.second())) {
-                needFindStacks.put(entry.getKey(), listSamplesFromInfo.second());
+            if (MiscUtils.isNotEmpty(listSamplesFromInfo.getRight())) {
+                needFindStacks.put(entry.getKey(), listSamplesFromInfo.getRight());
             }
         }
         List<ItemStack> mainInventoryCopy =
@@ -74,21 +74,21 @@ public class MachineAssembly {
             }
 
             Pair<List<IBlockState>, List<ItemStack>> listSamplesFromInfo = this.getListSamplesFromInfo(next);
-            if (listSamplesFromInfo.first() == null) {
+            if (listSamplesFromInfo.getLeft() == null) {
                 return;
             }
 
-            if (MiscUtils.isNotEmpty(listSamplesFromInfo.second()) || !Configuration.needAllBlocks) {
-                ItemStack stack = StackUtils.hasStacks(player.inventory.mainInventory, listSamplesFromInfo.second(), true);
+            if (MiscUtils.isNotEmpty(listSamplesFromInfo.getRight()) || !Configuration.needAllBlocks) {
+                ItemStack stack = StackUtils.hasStacks(player.inventory.mainInventory, listSamplesFromInfo.getRight(), true);
                 if (StackUtils.isNotEmpty(stack)) {
-                    int index = StackUtils.getIndex(listSamplesFromInfo.second(), stack);
+                    int index = StackUtils.getIndex(listSamplesFromInfo.getRight(), stack);
                     if (index == -1) {
                         player.sendMessage(MiscUtils.translate(3));
                         MachineAssemblyManager.removeMachineAssembly(this);
                         return;
                     }
 
-                    IBlockState state = listSamplesFromInfo.first().get(index);
+                    IBlockState state = listSamplesFromInfo.getLeft().get(index);
                     if (FluidUtils.isFluidHandler(stack)) {
                         player.addItemStackToInventory(new ItemStack(Items.BUCKET));
                         state = Objects.requireNonNull(FluidUtil.getFluidContained(stack)).getFluid().getBlock().getDefaultState();

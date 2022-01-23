@@ -1,6 +1,5 @@
 package ink.ikx.modularassembly;
 
-import ink.ikx.modularassembly.core.ModularMachineryEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -24,14 +23,10 @@ public class Main {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        // I know it's a bit dumb
-        // But if I don't do this, there nothing in the main class,
-        // and it feels even weirder
-        MinecraftForge.EVENT_BUS.register(ModularMachineryEvent.INSTANCE);
+
     }
 
     public boolean isMoCLoaded() {
-        // Just to make sure it's loaded
         return Loader.isModLoaded("modularcontroller");
     }
 

@@ -1,6 +1,0 @@
-#Tips
-tips.tip1=Modular Assembly: No modular machine found!
-tips.tip2=Modular Assembly: The machine is in the assembly queue!
-tips.tip3=Modular Assembly: Not enough blocks in inventory or blocked by blocks on the ground or no corresponding fluid bucket was found！
-tips.tip4=Modular Assembly: Not enough blocks for assembly.
-tips.tip5=Modular Assembly: Assembled successfully!

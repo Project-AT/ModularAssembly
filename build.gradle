@@ -33,6 +33,10 @@ repositories {
     maven { url = "https://dvs1.progwml6.com/files/maven" } //Jei
 }
 
+runClient {
+    args '--username', 'dev_player'
+}
+
 dependencies {
     runtime "mezz.jei:jei_${mcVersion}:${jeiVersion}"
     runtime "mcjty.theoneprobe:TheOneProbe-${mcShort}:${topVersion}"

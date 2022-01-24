@@ -1,8 +1,6 @@
 package ink.ikx.modularassembly;
 
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(
         modid = Main.MOD_ID,
@@ -19,17 +17,5 @@ public class Main {
             "required-after:crafttweaker;" +
             "required-after:modularmachinery@[1.11.0,);" +
             "after:modularcontroller@[1.2.1,)";
-
-    @Mod.Instance
-    public static Main instance;
-
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-
-    }
-
-    public boolean isMoCLoaded() {
-        return Loader.isModLoaded("modularcontroller");
-    }
 
 }

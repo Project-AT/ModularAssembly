@@ -1,4 +1,4 @@
-package ink.ikx.modularassembly.core;
+package ink.ikx.modularassembly.core.config;
 
 import ink.ikx.modularassembly.Main;
 import net.minecraftforge.common.config.Config;

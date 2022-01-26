@@ -1,1 +1,2 @@
 message.modularassembly.config.no_converted=§b[ModularAssembly] §cThe AutoAssembly Item cannot be converted correctly, please check the §lconfig§r§c.
+message.modularassembly.machine.required_blueprint=§b[ModularAssembly] §cThe corresponding §lBluePrint§r §cwas not found in the controller.

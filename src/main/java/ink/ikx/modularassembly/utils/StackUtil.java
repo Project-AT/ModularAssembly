@@ -4,15 +4,16 @@ import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.mc1120.brackets.BracketHandlerItem;
 import crafttweaker.mc1120.data.StringIDataParser;
-import ink.ikx.modularassembly.core.Configuration;
+import ink.ikx.modularassembly.core.config.Configuration;
 import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class StackUtil {
+public enum StackUtil {
 
-    public static final StackUtil INSTANCE = new StackUtil();
-    public static ItemStack AUTO_ASSEMBLY_ITEM = StackUtil.INSTANCE.strToStack(Configuration.AutoAssemblyItem);
+    INSTANCE;
+
+    public static final ItemStack AUTO_ASSEMBLY_ITEM = StackUtil.INSTANCE.strToStack(Configuration.AutoAssemblyItem);
 
     public ItemStack strToStack(String str) {
         String itemStr = StringUtils.substringBetween(str, "<", ">");

@@ -22,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import youyihj.modularcontroller.block.BlockMMController;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber
@@ -45,7 +46,7 @@ public class ModularMachineryEvent {
 
         if (CraftTweakerMC.getIItemStack(StackUtil.AUTO_ASSEMBLY_ITEM).matches(stack)) {
             if (MiscUtil.isMoCLoaded() && blockState.getBlock() instanceof BlockMMController) {
-                ((BlockMMController) block).getAssociatedMachines().stream()
+                List<String> machineNameList = ((BlockMMController) block).getAssociatedMachines().stream()
                         .map(DynamicMachine::getRegistryName)
                         .map(ResourceLocation::getPath)
                         .collect(Collectors.toList());

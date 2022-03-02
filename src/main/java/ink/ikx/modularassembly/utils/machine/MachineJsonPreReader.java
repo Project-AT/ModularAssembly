@@ -25,7 +25,8 @@ public enum MachineJsonPreReader implements JsonDeserializer<MachineJsonFormatIn
             for (JsonElement element : JsonUtils.getJsonArray(parts, "elements")) {
                 elements.add(element.getAsString());
             }
-            machineParts.add(new Parts(x, y, z, elements.toArray(new String[0])));
+
+//            machineParts.add(new Parts(x, y, z, itemName, elements.toArray(new String[0])));
         }
         return MachineJsonFormatInstance.getOrCreate(machineName, machineParts);
     }

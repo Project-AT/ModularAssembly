@@ -9,13 +9,11 @@ import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-public enum StackUtil {
+public class StackUtil {
 
-    INSTANCE;
+    public static final ItemStack AUTO_ASSEMBLY_ITEM = StackUtil.strToStack(Configuration.AutoAssemblyItem);
 
-    public static final ItemStack AUTO_ASSEMBLY_ITEM = StackUtil.INSTANCE.strToStack(Configuration.AutoAssemblyItem);
-
-    public ItemStack strToStack(String str) {
+    public static ItemStack strToStack(String str) {
         String itemStr = StringUtils.substringBetween(str, "<", ">");
         if (itemStr == null) return ItemStack.EMPTY;
         String[] split = itemStr.split(":");

@@ -44,7 +44,7 @@ public class ModularMachineryEvent {
         }
 
         if (CraftTweakerMC.getIItemStack(StackUtil.AUTO_ASSEMBLY_ITEM).matches(stack)) {
-            if (MiscUtil.INSTANCE.isMoCLoaded() && blockState.getBlock() instanceof BlockMMController) {
+            if (MiscUtil.isMoCLoaded() && blockState.getBlock() instanceof BlockMMController) {
                 ((BlockMMController) block).getAssociatedMachines().stream()
                         .map(DynamicMachine::getRegistryName)
                         .map(ResourceLocation::getPath)
@@ -55,7 +55,7 @@ public class ModularMachineryEvent {
                 if (machine != null) {
                     // TODO: Process this machine
                 } else {
-                    MiscUtil.INSTANCE.sendTranslateToLocalToPlayer(entityPlayer, "message.modularassembly.machine.required_blueprint");
+                    MiscUtil.sendTranslateToLocalToPlayer(entityPlayer, "message.modularassembly.machine.required_blueprint");
                 }
             }
             event.setCanceled(true);
@@ -68,7 +68,7 @@ public class ModularMachineryEvent {
         if (player.world.isRemote) return;
 
         if (StackUtil.AUTO_ASSEMBLY_ITEM.isEmpty()) {
-            MiscUtil.INSTANCE.sendTranslateToLocalToPlayer(player, "message.modularassembly.config.no_converted");
+            MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.config.no_converted");
         }
     }
 

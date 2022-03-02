@@ -39,12 +39,14 @@ public class MachineJsonFormatInstance {
         public final int x;
         public final int y;
         public final int z;
+        public final String itemName;
         public final String[] elements;
 
-        public Parts(int x, int y, int z, String[] elements) {
+        public Parts(int x, int y, int z, String itemName, String[] elements) {
             this.x = x;
             this.y = y;
             this.z = z;
+            this.itemName = itemName;
             this.elements = elements;
         }
 

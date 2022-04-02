@@ -6,6 +6,7 @@ import hellfirepvp.modularmachinery.common.block.BlockController;
 import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.TileMachineController;
 import ink.ikx.modularassembly.Main;
+import ink.ikx.modularassembly.core.MachineInAssembly;
 import ink.ikx.modularassembly.utils.MiscUtil;
 import ink.ikx.modularassembly.utils.StackUtil;
 import net.minecraft.block.state.IBlockState;
@@ -50,11 +51,17 @@ public class ModularMachineryEvent {
                         .map(DynamicMachine::getRegistryName)
                         .map(ResourceLocation::getPath)
                         .collect(Collectors.toList());
-                // TODO: Process these machines
+                if (machineNameList.stream().allMatch(n -> MachineInAssembly.create(blockPos, entityPlayer, n))) {
+                    // Start assembly
+                    MiscUtil.sendTranslateToLocalToPlayer(entityPlayer, "");
+                }
             } else {
                 DynamicMachine machine = controller.getBlueprintMachine();
                 if (machine != null) {
-                    // TODO: Process this machine
+                    if (MachineInAssembly.create(blockPos, entityPlayer, machine.getRegistryName().getPath())) {
+                        // Start assembly
+                        MiscUtil.sendTranslateToLocalToPlayer(entityPlayer, "");
+                    }
                 } else {
                     MiscUtil.sendTranslateToLocalToPlayer(entityPlayer, "message.modularassembly.machine.required_blueprint");
                 }
@@ -66,9 +73,7 @@ public class ModularMachineryEvent {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         EntityPlayer player = event.player;
-        if (player.world.isRemote) return;
-
-        if (StackUtil.AUTO_ASSEMBLY_ITEM.isEmpty()) {
+        if (!player.world.isRemote && StackUtil.AUTO_ASSEMBLY_ITEM.isEmpty()) {
             MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.config.no_converted");
         }
     }

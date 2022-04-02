@@ -1,14 +1,15 @@
 package ink.ikx.modularassembly.utils.machine;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import hellfirepvp.modularmachinery.common.util.BlockArray;
 import ink.ikx.modularassembly.utils.StackUtil;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,17 +63,23 @@ public class MachineJsonFormatInstance {
             return new BlockPos(x, y, z);
         }
 
-        public Pair<List<ItemStack>, Integer> getStackList() {
-            if (!StringUtils.isBlank(itemStack)) {
-                return Pair.of(Lists.newArrayList(StackUtil.strToStack(itemStack)), 1);
-            }
+        public BlockPos getBlockPos(BlockPos pos) {
+            return pos.add(getBlockPos());
+        }
 
-            List<ItemStack> toReturn = Lists.newArrayList(StackUtil.strToStack(this.itemStack));
+        public boolean matches(IBlockState state) {
+            return getStateList().stream().anyMatch(l -> l.stream().anyMatch(state::equals));
+        }
 
-            if (toReturn.isEmpty()) {
-                toReturn = Arrays.stream(elements).map(StackUtil::strToStack2).collect(Collectors.toList());
+        public List<List<IBlockState>> getStateList() {
+            return Arrays.stream(elements).map(BlockArray.BlockInformation::getDescriptor).map(d -> d.applicable).collect(Collectors.toList());
+        }
+
+        public List<List<ItemStack>> getStackList() {
+            if (!StringUtils.isBlank(itemStack) && !StackUtil.strToStack(itemStack).isEmpty()) {
+                return Collections.singletonList(Collections.singletonList(StackUtil.strToStack(itemStack)));
             }
-            return Pair.of(toReturn, toReturn.size());
+            return Arrays.stream(elements).map(StackUtil::strToStack2).collect(Collectors.toList());
         }
 
     }

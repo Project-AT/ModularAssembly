@@ -4,6 +4,7 @@ import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.mc1120.brackets.BracketHandlerItem;
 import crafttweaker.mc1120.data.StringIDataParser;
+import hellfirepvp.modularmachinery.common.util.BlockArray;
 import ink.ikx.modularassembly.core.config.Configuration;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
@@ -12,15 +13,14 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StackUtil {
 
@@ -43,17 +43,21 @@ public class StackUtil {
         return CraftTweakerMC.getItemStack(toReturn);
     }
 
-    @SuppressWarnings("deprecation")
-    public static ItemStack strToStack2(String str) {
-        String[] split = str.split("@");
-        if (split.length != 2) return ItemStack.EMPTY;
+    public static List<ItemStack> strToStack2(String str) {
+        List<IBlockState> allState = BlockArray.BlockInformation.getDescriptor(str).applicable;
+        return allState.stream().map(StackUtil::getStackFromBlockState).collect(Collectors.toList());
+    }
 
-        ResourceLocation res = new ResourceLocation(split[0].split(":")[0], split[0].split(":")[1]);
-        Block block = ForgeRegistries.BLOCKS.getValue(res);
+    public static boolean isStackInInventory(ItemStack stack, List<ItemStack> inventory) {
+        return inventory.stream().map(CraftTweakerMC::getIItemStack).anyMatch(CraftTweakerMC.getIItemStack(stack)::matches);
+    }
 
-        assert block != null;
-        IBlockState state = block.getStateFromMeta(Integer.parseInt(split[1]));
+    public static boolean areStacksInInventory(List<ItemStack> stacks, List<ItemStack> inventory) {
+        return stacks.stream().anyMatch(s -> StackUtil.isStackInInventory(s, inventory));
+    }
 
+    public static ItemStack getStackFromBlockState(IBlockState state) {
+        Block block = state.getBlock();
         if (block instanceof BlockFluidBase) {
             return FluidUtil.getFilledBucket(new FluidStack(((BlockFluidBase) block).getFluid(), 1000));
         } else if (block instanceof BlockLiquid) {
@@ -65,18 +69,6 @@ public class StackUtil {
             }
         }
         return new ItemStack(Item.getItemFromBlock(block), 1, block.damageDropped(state));
-
-    }
-
-    public static boolean isStackInInventory(ItemStack stack, List<ItemStack> inventory) {
-        IItemStack input = CraftTweakerMC.getIItemStack(stack);
-        List<IItemStack> inventory_ = CraftTweakerMC.getIItemStackList(inventory);
-
-        for (IItemStack iItemStack : inventory_) {
-            if (input.matches(iItemStack)) return true;
-        }
-
-        return false;
     }
 
 }

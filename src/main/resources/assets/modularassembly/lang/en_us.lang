@@ -1,2 +1,5 @@
 message.modularassembly.config.no_converted=§b[ModularAssembly] §cThe AutoAssembly Item cannot be converted correctly, please check the §lconfig§r§c.
 message.modularassembly.machine.required_blueprint=§b[ModularAssembly] §cThe corresponding §lBluePrint§r §cwas not found in the controller.
+message.modularassembly.machine.start=§b[ModularAssembly] §aStart Assembly.
+message.modularassembly.machine.inventory_not_enough=§b[ModularAssembly] §cInsufficient items in the inventory.
+message.modularassembly.machine.error=§b[ModularAssembly] §cThis is an unknown error, please go to GitHub and report Issue.

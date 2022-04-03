@@ -29,11 +29,11 @@ public class MachineInAssembly {
         return new MachineInAssembly(pos, player, machineInstance);
     }
 
-    public static boolean create(BlockPos pos, EntityPlayer player, String machineName) {
+    public static boolean create(BlockPos pos, EntityPlayer player, String machineName, boolean isLast) {
         MachineJsonFormatInstance machineInstance = MachineJsonFormatInstance.MACHINES.get(machineName);
         if (machineInstance == null) {
             // in theory this shouldn't be executed
-            MiscUtil.sendTranslateToLocalToPlayer(player, "");
+            if (isLast) MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.machine.error");
             return false;
         }
         MachineInAssembly instance = MachineInAssembly.of(pos, player, machineInstance);
@@ -45,7 +45,8 @@ public class MachineInAssembly {
                 if (StackUtil.areStacksInInventory(stacks, player.inventory.mainInventory)) continue outer;
             }
             // items not enough in inventory
-            MiscUtil.sendTranslateToLocalToPlayer(player, "");
+            if (isLast)
+                MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.machine.inventory_not_enough");
             return false;
         }
         return WORKING_MACHINE.add(instance);

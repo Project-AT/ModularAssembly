@@ -1,2 +1,5 @@
-message.modularassembly.config.no_converted=§b[模块化组装] §c自动组装的物品解析出错, 请检查§l配置文件§r§c.
-message.modularassembly.machine.required_blueprint=§b[模块化组装] §c控制器中没有找到对应的§l蓝图§r§c.
+message.modularassembly.config.no_converted=§b[模块化组装] §c自动组装的物品解析出错, 请检查§l配置文件§r§c。
+message.modularassembly.machine.required_blueprint=§b[模块化组装] §c控制器中没有找到对应的§l蓝图§r§c。
+message.modularassembly.machine.start=§b[模块化组装] §a开始组装。
+message.modularassembly.machine.inventory_not_enough=§b[模块化组装] §c背包内物品不足。
+message.modularassembly.machine.error=§b[模块化组装] §c出现了未知的错误，请前往GitHub上报Issue。

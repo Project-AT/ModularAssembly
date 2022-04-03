@@ -13,8 +13,6 @@ import org.apache.logging.log4j.Logger;
 )
 public class Main {
 
-    public static Logger logger;
-
     public static final String MOD_ID = "modularassembly";
     public static final String MOD_NAME = "ModularAssembly";
     public static final String VERSION = "1.0.2";
@@ -22,6 +20,7 @@ public class Main {
             "required-after:crafttweaker;" +
             "required-after:modularmachinery@[1.11.0,);" +
             "after:modularcontroller@[1.2.1,)";
+    public static Logger logger;
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {

@@ -19,12 +19,15 @@ public enum MachineJsonPreReader implements JsonDeserializer<MachineJsonFormatIn
         List<Parts> machineParts = Lists.newArrayList();
 
         for (JsonElement parts : JsonUtils.getJsonArray(jsonObject, "parts")) {
-            int x = JsonUtils.getInt(parts, "x");
-            int y = JsonUtils.getInt(parts, "y");
-            int z = JsonUtils.getInt(parts, "z");
+            JsonObject partsObject = parts.getAsJsonObject();
+            int x = JsonUtils.getInt(partsObject, "x");
+            int y = JsonUtils.getInt(partsObject, "y");
+            int z = JsonUtils.getInt(partsObject, "z");
             List<String> elements = Lists.newArrayList();
-            for (JsonElement element : JsonUtils.getJsonArray(parts, "elements")) {
-                elements.add(element.getAsString());
+            if (partsObject.get("elements").isJsonArray()) {
+                JsonUtils.getJsonArray(partsObject, "elements").forEach(e -> elements.add(e.getAsString()));
+            } else {
+                elements.add(JsonUtils.getString(partsObject, "elements"));
             }
             String itemStack = JsonUtils.getString(parts.getAsJsonObject(), "itemStack", "");
             machineParts.add(new Parts(x, y, z, itemStack, elements.toArray(new String[0])));

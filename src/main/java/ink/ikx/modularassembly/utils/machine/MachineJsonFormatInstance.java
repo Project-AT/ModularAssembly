@@ -48,14 +48,14 @@ public class MachineJsonFormatInstance {
         public final int x;
         public final int y;
         public final int z;
-        public final String itemStack;
         public final String[] elements;
+        public final String[] itemStacks;
 
-        public Parts(int x, int y, int z, String itemStack, String[] elements) {
+        public Parts(int x, int y, int z, String[] itemStacks, String[] elements) {
             this.x = x;
             this.y = y;
             this.z = z;
-            this.itemStack = itemStack;
+            this.itemStacks = itemStacks;
             this.elements = elements;
         }
 
@@ -76,10 +76,9 @@ public class MachineJsonFormatInstance {
         }
 
         public List<List<ItemStack>> getStackList() {
-            if (!StringUtils.isBlank(itemStack) && !StackUtil.strToStack(itemStack).isEmpty()) {
-                return Collections.singletonList(Collections.singletonList(StackUtil.strToStack(itemStack)));
-            }
-            return Arrays.stream(elements).map(StackUtil::strToStack2).collect(Collectors.toList());
+            List<List<ItemStack>> toReturn = Arrays.stream(itemStacks).filter(i -> !StringUtils.isBlank(i) && !StackUtil.strToStack(i).isEmpty())
+                    .map(StackUtil::strToStack).map(Collections::singletonList).collect(Collectors.toList());
+            return toReturn.isEmpty() ? Arrays.stream(elements).map(StackUtil::strToStack2).collect(Collectors.toList()) : toReturn;
         }
 
     }

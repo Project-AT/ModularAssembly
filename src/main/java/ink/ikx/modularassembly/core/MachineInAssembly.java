@@ -49,7 +49,12 @@ public class MachineInAssembly {
                 MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.machine.inventory_not_enough");
             return false;
         }
-        return WORKING_MACHINE.add(instance);
+        if (WORKING_MACHINE.add(instance)) {
+            MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.machine.start");
+        } else {
+            MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.machine.starting");
+        }
+        return true;
     }
 
     @Override

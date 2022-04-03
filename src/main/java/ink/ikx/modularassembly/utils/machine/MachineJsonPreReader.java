@@ -23,16 +23,22 @@ public enum MachineJsonPreReader implements JsonDeserializer<MachineJsonFormatIn
             int x = JsonUtils.getInt(partsObject, "x");
             int y = JsonUtils.getInt(partsObject, "y");
             int z = JsonUtils.getInt(partsObject, "z");
-            List<String> elements = Lists.newArrayList();
-            if (partsObject.get("elements").isJsonArray()) {
-                JsonUtils.getJsonArray(partsObject, "elements").forEach(e -> elements.add(e.getAsString()));
-            } else {
-                elements.add(JsonUtils.getString(partsObject, "elements"));
-            }
-            String itemStack = JsonUtils.getString(parts.getAsJsonObject(), "itemStack", "");
-            machineParts.add(new Parts(x, y, z, itemStack, elements.toArray(new String[0])));
+            machineParts.add(new Parts(x, y, z,
+                    getJsonMaybeArray(partsObject, "itemStacks"),
+                    getJsonMaybeArray(partsObject, "elements"))
+            );
         }
         return MachineJsonFormatInstance.getOrCreate(machineName, machineParts);
+    }
+
+    private String[] getJsonMaybeArray(JsonObject partsObject, String memberName) {
+        List<String> toReturn = Lists.newArrayList();
+        if (JsonUtils.isJsonArray(partsObject, memberName)) {
+            JsonUtils.getJsonArray(partsObject, memberName).forEach(e -> toReturn.add(e.getAsString()));
+        } else {
+            toReturn.add(JsonUtils.getString(partsObject, memberName, ""));
+        }
+        return toReturn.toArray(new String[0]);
     }
 
 }

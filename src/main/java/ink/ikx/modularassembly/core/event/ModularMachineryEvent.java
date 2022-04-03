@@ -52,22 +52,14 @@ public class ModularMachineryEvent {
                         .map(ResourceLocation::getPath)
                         .collect(Collectors.toList());
                 for (int i = 0; i < machineNameList.size(); i++) {
-                    if (i == machineNameList.size() - 1) { // 如果一个条件都不符合，才给出提醒
-                        if (MachineInAssembly.create(blockPos, entityPlayer, machineNameList.get(i), true)) {
-                            MiscUtil.sendTranslateToLocalToPlayer(entityPlayer, "message.modularassembly.machine.start");
-                        }
-                    } else {
-                        if (MachineInAssembly.create(blockPos, entityPlayer, machineNameList.get(i), false)) {
-                            MiscUtil.sendTranslateToLocalToPlayer(entityPlayer, "message.modularassembly.machine.start");
-                        }
-                    }
+                    // 如果一个条件都不符合，才给出提醒
+                    if (MachineInAssembly.create(blockPos, entityPlayer, machineNameList.get(i), i == machineNameList.size() - 1))
+                        break;
                 }
             } else {
                 DynamicMachine machine = controller.getBlueprintMachine();
                 if (machine != null) {
-                    if (MachineInAssembly.create(blockPos, entityPlayer, machine.getRegistryName().getPath(), true)) {
-                        MiscUtil.sendTranslateToLocalToPlayer(entityPlayer, "message.modularassembly.machine.start");
-                    }
+                    MachineInAssembly.create(blockPos, entityPlayer, machine.getRegistryName().getPath(), true);
                 } else {
                     MiscUtil.sendTranslateToLocalToPlayer(entityPlayer, "message.modularassembly.machine.required_blueprint");
                 }

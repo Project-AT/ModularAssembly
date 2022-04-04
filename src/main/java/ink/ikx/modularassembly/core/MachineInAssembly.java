@@ -71,6 +71,15 @@ public class MachineInAssembly {
         return true;
     }
 
+    public void assembly() {
+        List<MachineJsonFormatInstance.Parts> machineParts = this.machineInstance.getMachineParts();
+        if (machineParts.get(0).assembly(getPlayer(), getPos())) {
+            machineParts.remove(0);
+        } else {
+            WORKING_MACHINE.remove(this);
+        }
+    }
+
     public EntityPlayer getPlayer() {
         return player;
     }

@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -49,11 +50,23 @@ public class StackUtil {
     }
 
     public static boolean isStackInInventory(ItemStack stack, List<ItemStack> inventory) {
-        return inventory.stream().map(CraftTweakerMC::getIItemStack).anyMatch(CraftTweakerMC.getIItemStack(stack)::matches);
+        return !getStacksInInventory(stack, inventory).isEmpty();
     }
 
     public static boolean areStacksInInventory(List<ItemStack> stacks, List<ItemStack> inventory) {
-        return stacks.stream().anyMatch(s -> StackUtil.isStackInInventory(s, inventory));
+        return !getStacksInInventory(stacks, inventory).isEmpty();
+    }
+
+    public static ItemStack getStacksInInventory(ItemStack stack, List<ItemStack> inventory) {
+        return inventory.stream()
+                .map(CraftTweakerMC::getIItemStack)
+                .filter(CraftTweakerMC.getIItemStack(stack)::matches)
+                .map(CraftTweakerMC::getItemStack)
+                .findFirst().orElse(ItemStack.EMPTY);
+    }
+
+    public static ItemStack getStacksInInventory(List<ItemStack> stacks, List<ItemStack> inventory) {
+        return stacks.stream().filter(s -> StackUtil.isStackInInventory(s, inventory)).findFirst().orElse(ItemStack.EMPTY);
     }
 
     public static ItemStack getStackFromBlockState(IBlockState state) {
@@ -69,6 +82,15 @@ public class StackUtil {
             }
         }
         return new ItemStack(Item.getItemFromBlock(block), 1, block.damageDropped(state));
+    }
+
+    @SuppressWarnings("deprecation")
+    public static IBlockState getBlockStareFromStack(ItemStack stack) {
+        Block block = ForgeRegistries.BLOCKS.getValue(stack.getItem().getRegistryName());
+        if (block != null) {
+            return block.getStateFromMeta(stack.getMetadata());
+        }
+        return null;
     }
 
 }

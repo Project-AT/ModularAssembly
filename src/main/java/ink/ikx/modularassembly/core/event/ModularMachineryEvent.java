@@ -80,12 +80,7 @@ public class ModularMachineryEvent {
             return;
 
         Set<MachineInAssembly> workingMachineFromPlayer = MachineInAssembly.getWorkingMachineFromPlayer(player);
-        for (MachineInAssembly machineInAssembly : workingMachineFromPlayer) {
-            if (world.isBlockLoaded(machineInAssembly.getPos())) {
-                // TODO: Start Assembly
-            }
-        }
-
+        workingMachineFromPlayer.stream().filter(m -> world.isBlockLoaded(m.getPos())).forEach(MachineInAssembly::assembly);
     }
 
     @SubscribeEvent

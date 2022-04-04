@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
+import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.mc1120.brackets.BracketHandlerBlockState;
 import hellfirepvp.modularmachinery.common.CommonProxy;
@@ -162,10 +163,16 @@ public class MachineJsonFormatInstance {
             } else {
                 for (List<ItemStack> stacks : this.getStackList()) {
                     ItemStack stacksInInventory = StackUtil.getStacksInInventory(stacks, player.inventory.mainInventory);
-                    IBlockState blockStareFromStack = StackUtil.getBlockStareFromStack(stacksInInventory);
-                    if (!stacksInInventory.isEmpty() && blockStareFromStack != null) {
-                        world.setBlockState(getBlockPos(pos), blockStareFromStack);
-                        return true;
+                    if (!stacksInInventory.isEmpty()) {
+                        IItemStack stackCrt = CraftTweakerMC.getIItemStack(stacksInInventory);
+                        for (List<IBlockState> iBlockStates : this.getStateList()) {
+                            IBlockState iBlockState = iBlockStates.stream().filter(b -> CraftTweakerMC.getIItemStack(StackUtil.getStackFromBlockState(b))
+                                    .matches(stackCrt)).findFirst().orElse(null);
+                            if (iBlockState != null) {
+                                world.setBlockState(getBlockPos(pos), iBlockState);
+                                return true;
+                            }
+                        }
                     } else {
                         MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.machine.error");
                         return false;

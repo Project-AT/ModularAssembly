@@ -15,7 +15,9 @@ import ink.ikx.modularassembly.utils.StackUtil;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
@@ -157,6 +159,7 @@ public class MachineJsonFormatInstance {
                     if (!StackUtil.getStacksInInventory(stack, player.inventory.mainInventory).isEmpty()) {
                         IBlockState state = this.getStateList().get(0).get(i);
                         world.setBlockState(getBlockPos(pos), state);
+                        world.playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
                         return true;
                     }
                 }
@@ -170,6 +173,7 @@ public class MachineJsonFormatInstance {
                                     .matches(stackCrt)).findFirst().orElse(null);
                             if (iBlockState != null) {
                                 world.setBlockState(getBlockPos(pos), iBlockState);
+                                world.playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
                                 return true;
                             }
                         }

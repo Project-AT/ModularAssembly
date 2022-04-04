@@ -3,3 +3,5 @@ message.modularassembly.machine.required_blueprint=§b[模块化组装] §c控�
 message.modularassembly.machine.start=§b[模块化组装] §a开始组装。
 message.modularassembly.machine.inventory_not_enough=§b[模块化组装] §c背包内物品不足。
 message.modularassembly.machine.error=§b[模块化组装] §c出现了未知的错误，请前往GitHub上报Issue。
+message.modularassembly.machine.starting=§b[模块化组装] §e机器已在组装队列中。
+message.modularassembly.machine.block_exist=§b[模块化组装] §c你必须保证组装时没有任何方块阻挡。

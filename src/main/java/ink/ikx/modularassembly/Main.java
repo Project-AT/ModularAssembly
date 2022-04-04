@@ -1,6 +1,6 @@
 package ink.ikx.modularassembly;
 
-import ink.ikx.modularassembly.utils.machine.MachineUtil;
+import ink.ikx.modularassembly.utils.machine.MachineJsonFormatInstance;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +25,7 @@ public class Main {
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
-        MachineUtil.initAllMachine();
+        MachineJsonFormatInstance.initAllMachine();
     }
 
 }

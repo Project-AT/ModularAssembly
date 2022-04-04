@@ -7,6 +7,7 @@ import hellfirepvp.modularmachinery.common.machine.DynamicMachine;
 import hellfirepvp.modularmachinery.common.tiles.TileMachineController;
 import ink.ikx.modularassembly.Main;
 import ink.ikx.modularassembly.core.MachineInAssembly;
+import ink.ikx.modularassembly.core.config.Configuration;
 import ink.ikx.modularassembly.utils.MiscUtil;
 import ink.ikx.modularassembly.utils.StackUtil;
 import net.minecraft.block.state.IBlockState;
@@ -21,9 +22,11 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import youyihj.modularcontroller.block.BlockMMController;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber
@@ -65,6 +68,31 @@ public class ModularMachineryEvent {
                 }
             }
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        EntityPlayer player = event.player;
+        World world = player.world;
+        if (event.phase == TickEvent.Phase.START || event.side.isClient() ||
+                world.getWorldTime() % Configuration.TickBlock != 0 || MachineInAssembly.WORKING_MACHINE.isEmpty())
+            return;
+
+        Set<MachineInAssembly> workingMachineFromPlayer = MachineInAssembly.getWorkingMachineFromPlayer(player);
+        for (MachineInAssembly machineInAssembly : workingMachineFromPlayer) {
+            if (world.isBlockLoaded(machineInAssembly.getPos())) {
+                // TODO: Start Assembly
+            }
+        }
+
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        EntityPlayer player = event.player;
+        if (!player.world.isRemote && !MachineInAssembly.WORKING_MACHINE.isEmpty()) {
+            MachineInAssembly.WORKING_MACHINE.removeIf(m -> m.getPlayer().equals(player));
         }
     }
 

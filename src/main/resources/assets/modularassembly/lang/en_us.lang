@@ -3,3 +3,5 @@ message.modularassembly.machine.required_blueprint=§b[ModularAssembly] §cThe c
 message.modularassembly.machine.start=§b[ModularAssembly] §aStart Assembly.
 message.modularassembly.machine.inventory_not_enough=§b[ModularAssembly] §cInsufficient items in the inventory.
 message.modularassembly.machine.error=§b[ModularAssembly] §cThis is an unknown error, please go to GitHub and report Issue.
+message.modularassembly.machine.starting=§b[ModularAssembly] §eThe machine is in the assembly queue!
+message.modularassembly.machine.block_exist=§b[ModularAssembly] §bWhen assembling, you must ensure that there are no blocks in the location where they are placed.

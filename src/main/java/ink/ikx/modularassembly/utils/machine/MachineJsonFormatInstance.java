@@ -134,7 +134,7 @@ public class MachineJsonFormatInstance {
             List<List<IBlockState>> toReturn = Arrays.stream(blockstates)
                     .filter(s -> s.contains(":"))
                     .map(s -> s.split(":"))
-                    .map(s -> BracketHandlerBlockState.getBlockState(s[1] + ":" + s[2], s[3]))
+                    .map(s -> BracketHandlerBlockState.getBlockState(s[1] + ":" + s[2], s[3].replace(">", "")))
                     .map(CraftTweakerMC::getBlockState).map(Collections::singletonList).collect(Collectors.toList());
 
             return toReturn.isEmpty() ? Arrays.stream(elements).map(BlockArray.BlockInformation::getDescriptor)
@@ -152,17 +152,18 @@ public class MachineJsonFormatInstance {
             IBlockState blockState = world.getBlockState(getBlockPos(pos));
             if (!isSkip(blockState, player)) return false;
 
+            // 检查是否为自定义的物品和BlockState，如果不是则进行原版搜索
             if (StringUtils.isNotBlank(this.itemStacks[0])) {
-                List<ItemStack> get = this.getStackList().get(0);
-                for (int i = 0; i < get.size(); i++) {
-                    ItemStack stack = get.get(i);
-                    if (!StackUtil.getStacksInInventory(stack, player.inventory.mainInventory).isEmpty()) {
-                        IBlockState state = this.getStateList().get(0).get(i);
-                        world.setBlockState(getBlockPos(pos), state);
-                        world.playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
-                        return true;
-                    }
+                List<ItemStack> stackList = this.getStackList().get(0);
+                ItemStack stack = StackUtil.getStacksInInventory(stackList.get(0), player.inventory.mainInventory);
+                boolean toReturn = stack.isEmpty();
+                if (!toReturn) {
+                    stack.shrink(1);
+                    this.setBlockState(world, pos, this.getStateList().get(0).get(0));
+                } else {
+                    MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.machine.inventory_not_enough");
                 }
+                return toReturn;
             } else {
                 for (List<ItemStack> stacks : this.getStackList()) {
                     ItemStack stacksInInventory = StackUtil.getStacksInInventory(stacks, player.inventory.mainInventory);
@@ -172,19 +173,24 @@ public class MachineJsonFormatInstance {
                             IBlockState iBlockState = iBlockStates.stream().filter(b -> CraftTweakerMC.getIItemStack(StackUtil.getStackFromBlockState(b))
                                     .matches(stackCrt)).findFirst().orElse(null);
                             if (iBlockState != null) {
-                                world.setBlockState(getBlockPos(pos), iBlockState);
-                                world.playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                                stacksInInventory.shrink(1);
+                                this.setBlockState(world, pos, iBlockState);
                                 return true;
                             }
                         }
                     } else {
-                        MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.machine.error");
+                        MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.machine.inventory_not_enough");
                         return false;
                     }
                 }
             }
-
+            MiscUtil.sendTranslateToLocalToPlayer(player, "message.modularassembly.machine.error");
             return false;
+        }
+
+        private void setBlockState(World world, BlockPos pos, IBlockState iBlockState) {
+            world.setBlockState(getBlockPos(pos), iBlockState);
+            world.playSound(null, pos, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1.0F, 1.0F);
         }
 
         public boolean isSkip(IBlockState state, EntityPlayer player) {

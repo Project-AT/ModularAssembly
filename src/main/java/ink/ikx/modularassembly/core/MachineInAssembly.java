@@ -73,7 +73,7 @@ public class MachineInAssembly {
 
     public void assembly() {
         List<MachineJsonFormatInstance.Parts> machineParts = this.machineInstance.getMachineParts();
-        if (machineParts.get(0).assembly(getPlayer(), getPos())) {
+        if (machineParts.get(0).execute(getPlayer(), getPos())) {
             machineParts.remove(0);
         } else {
             WORKING_MACHINE.remove(this);

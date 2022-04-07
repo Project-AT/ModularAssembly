@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
-import crafttweaker.mc1120.brackets.BracketHandlerBlockState;
 import hellfirepvp.modularmachinery.common.CommonProxy;
 import hellfirepvp.modularmachinery.common.machine.MachineLoader;
 import hellfirepvp.modularmachinery.common.util.BlockArray;
@@ -132,10 +131,8 @@ public class MachineJsonFormatInstance {
 
         public List<List<IBlockState>> getStateList() {
             List<List<IBlockState>> toReturn = Arrays.stream(blockstates)
-                    .filter(s -> s.contains(":"))
-                    .map(s -> s.split(":"))
-                    .map(s -> BracketHandlerBlockState.getBlockState(s[1] + ":" + s[2], s[3].replace(">", "")))
-                    .map(CraftTweakerMC::getBlockState).map(Collections::singletonList).collect(Collectors.toList());
+                    .map(MiscUtil::strToState)
+                    .map(Collections::singletonList).collect(Collectors.toList());
 
             return toReturn.isEmpty() ? Arrays.stream(elements).map(BlockArray.BlockInformation::getDescriptor)
                     .map(d -> d.applicable).collect(Collectors.toList()) : toReturn;
@@ -147,12 +144,12 @@ public class MachineJsonFormatInstance {
             return toReturn.isEmpty() ? Arrays.stream(elements).map(StackUtil::strToStack2).collect(Collectors.toList()) : toReturn;
         }
 
-        public boolean assembly(EntityPlayer player, BlockPos pos) {
+        public boolean execute(EntityPlayer player, BlockPos pos) {
             World world = player.getEntityWorld();
             IBlockState blockState = world.getBlockState(getBlockPos(pos));
-            if (!isSkip(blockState, player)) return false;
+            if (isSkip(blockState, player)) return true;
 
-            // 检查是否为自定义的物品和BlockState，如果不是则进行原版搜索
+            // 检查是否为自定义的物品和自定义的IBlockState，如果不是则进行原版搜索
             if (StringUtils.isNotBlank(this.itemStacks[0])) {
                 List<ItemStack> stackList = this.getStackList().get(0);
                 ItemStack stack = StackUtil.getStacksInInventory(stackList.get(0), player.inventory.mainInventory);

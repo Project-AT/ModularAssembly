@@ -2,11 +2,14 @@ package ink.ikx.modularassembly.utils.machine;
 
 import com.google.common.collect.Lists;
 import com.google.gson.*;
+import ink.ikx.modularassembly.utils.MiscUtil;
+import ink.ikx.modularassembly.utils.StackUtil;
 import ink.ikx.modularassembly.utils.machine.MachineJsonFormatInstance.Parts;
 import net.minecraft.util.JsonUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 
 public enum MachineJsonPreReader implements JsonDeserializer<MachineJsonFormatInstance> {
@@ -30,9 +33,20 @@ public enum MachineJsonPreReader implements JsonDeserializer<MachineJsonFormatIn
             if ((StringUtils.isNotBlank(itemStacks[0]) || StringUtils.isNotBlank(blockstates[0])) && itemStacks.length != blockstates.length) {
                 throw new JsonParseException("itemStacks and elements must have the same length");
             }
+            if (!validationItemStack(itemStacks) && !validationIBlockState(blockstates)) {
+                throw new JsonParseException("itemStacks and elements must be valid");
+            }
             machineParts.add(new Parts(x, y, z, itemStacks, blockstates, elements));
         }
         return MachineJsonFormatInstance.getOrCreate(machineName, machineParts);
+    }
+
+    private boolean validationIBlockState(String[] toValidate) {
+        return Arrays.stream(toValidate).noneMatch(s -> MiscUtil.strToState(s) != null);
+    }
+
+    private boolean validationItemStack(String[] toValidate) {
+        return Arrays.stream(toValidate).noneMatch(s -> StackUtil.strToStack(s).isEmpty());
     }
 
     private String[] getJsonMaybeArray(JsonObject partsObject, String memberName) {

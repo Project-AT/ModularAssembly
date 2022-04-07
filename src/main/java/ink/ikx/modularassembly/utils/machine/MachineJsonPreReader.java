@@ -42,7 +42,7 @@ public enum MachineJsonPreReader implements JsonDeserializer<MachineJsonFormatIn
     }
 
     private boolean validationIBlockState(String[] toValidate) {
-        return Arrays.stream(toValidate).noneMatch(s -> MiscUtil.strToState(s) != null);
+        return Arrays.stream(toValidate).noneMatch(s -> MiscUtil.strToState(s) == null);
     }
 
     private boolean validationItemStack(String[] toValidate) {
